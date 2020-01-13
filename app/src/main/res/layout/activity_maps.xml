@@ -1,9 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- layout for the entire page -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapsActivity" />
+    android:orientation="vertical"
+     >
+
+    <!--this fragment holds the map    -->
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        tools:context=".MapsActivity" />
+
+
+    <!--this layout holds the buttons associated with Routes-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <!-- button for Routes-->
+        <Button
+            android:id="@+id/routesButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:onClick="onRoutes"
+            android:text="@string/route_Button" />
+
+        <!-- button for New Route-->
+        <Button
+            android:id="@+id/newRouteButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:onClick="onRoutes"
+            android:text="@string/new_route_button" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

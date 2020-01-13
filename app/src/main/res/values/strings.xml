@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">GhostPB</string>
     <string name="title_activity_maps">Map</string>
+    <string name="mapHeight" translatable="false">415dp</string>
+    <string name="route_Button">Routes</string>
+    <string name="new_route_button">New Route</string>
+    <string name="ghost_data_button">Ghost Times</string>
 </resources>

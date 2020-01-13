@@ -8,15 +8,19 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -33,9 +37,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     //fused location provider
+    //use this to access current locaation information in the form of a LatLng object
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    //boolean set to true when permission is granted to access location data
+    //boolean set to true when permission is granted to access location data by user
     private boolean boolLocationPermissionGranted;
 
     //for verbosity, used to check is location permissions have been granted. (1 is positive status code)
@@ -44,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //variable to hold the default zoom of the camera controlling the map
     private static final int DEFAULT_ZOOM = 15;
 
-    //the last known location retrieved by the fused location provider
+    //the last known location of the users device retrieved by the fused location provider
     private Location lastKnowLocation;
 
     //default location for when location permissions are not granted
@@ -102,6 +107,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
+    //this function responds to when the Routes or New Route button has been clicked
+    public void onRoutes(View view) {
+
+        //when the user hits the routes button
+        if(view.getId() == R.id.routesButton) {
+
+        }
+
+        //when the user hits the new route button
+        if (view.getId() == R.id.newRouteButton) {
+
+
+        }
+
+
+
+    }
+
     //prompt user with box for device location permission
     private void requestLocationPermissions() {
 
@@ -155,6 +179,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //adds the button that jumps to your current location
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
+
+
+
+
             //location permission is not on yet, so ask the user for these permissions
             } else {
                 mMap.setMyLocationEnabled(false);
@@ -164,6 +192,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
+            //catch errors
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
@@ -193,6 +222,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //move the camera to the last known location
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM));
+
+                                /**
+                                //add a 5 meter circle around the users location
+                                Circle userCircle = mMap.addCircle(new CircleOptions()
+                                        .center(new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()))
+                                        .radius(5)
+                                        .strokeColor(Color.RED)
+                                        .fillColor(Color.BLUE));
+                                 */
+
                             }
 
                         } else {
@@ -211,6 +250,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             }
+
+            //catch errors
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
