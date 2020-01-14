@@ -13,6 +13,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -55,6 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //default location for when location permissions are not granted
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
 
+    //true when user is currently making a new route
+    private boolean currentlyMakingARoute;
 
 
     @Override
@@ -96,13 +100,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        //turn on myLocation control button on the map
+        //turn on myLocation control button on the map (top right set my location button)
         updateLocationUI();
 
 
 
-        //finds the phone and sets the map to go to your current location
+        //finds the phone and sets the map to go to users current location
         showDeviceLocation();
+
+
+    }
+
+
+    //this function will start requesting the users location every second and saving
+    //LatLng objects along with time information to create ghost data at the end of the session
+    public void startRoute(View view) {
+
+        //Task<Location> currentLocation = fusedLocationProviderClient.getLastLocation();
+
+        //get a handle to the active switch toggle
+        Switch activeSwitch = findViewById(R.id.activeSwitch);
+
+        //set the active switch to on
+        activeSwitch.setChecked(true);
+
+
 
 
     }
@@ -111,13 +133,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this function responds to when the Routes or New Route button has been clicked
     public void onRoutes(View view) {
 
+        //tell logcat user is doing something with routes
+        Log.d("Route", "User has clicked a button associated with routes");
+        Log.d("Route", "view.getId() = " + view.getId());
+        Log.d("Route", "R.id.routesButton = " + R.id.routesButton);
+
         //when the user hits the routes button
+        //bring up the users saved routes
         if(view.getId() == R.id.routesButton) {
 
         }
 
         //when the user hits the new route button
+        //start the route making process
         if (view.getId() == R.id.newRouteButton) {
+
+            //tell logcat user is creating a route
+            Log.d("Route", "User has clicked new route");
+
+            //set the boolean keeping track of route making status to true
+            currentlyMakingARoute = true;
+
+            //calls custom function to start routing the route and tracking the users location and time
+            startRoute(view);
+
 
 
         }

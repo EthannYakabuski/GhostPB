@@ -5,4 +5,5 @@
     <string name="route_Button">Routes</string>
     <string name="new_route_button">New Route</string>
     <string name="ghost_data_button">Ghost Times</string>
+    <string name="online_button">Active</string>
 </resources>
