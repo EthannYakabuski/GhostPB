@@ -28,20 +28,20 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="75dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:onClick="onRoutes"
-            android:text="@string/route_Button"
-            android:layout_marginStart="5dp" />
+            android:text="@string/route_Button" />
 
         <Button
             android:id="@+id/newRouteButton"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="75dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:onClick="onRoutes"
-            android:text="@string/new_route_button"
-            android:layout_marginStart="5dp" />
+            android:text="@string/new_route_button" />
 
 
     </LinearLayout>
@@ -53,7 +53,23 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:text="@string/online_button"
-        android:layout_marginStart="5dp" />
+        android:onClick="onToggle"
+        android:layout_marginStart="5dp"
+        />
+
+    <TextView
+        android:id="@+id/textViewCountdown"
+        android:layout_width="match_parent"
+        android:layout_height="31dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:text="TextView"
+        tools:text="@string/default_time"
+        android:textColor="@android:color/black"
+        android:textAlignment="center"
+        android:textSize="20dp" />
+
 
 
 </LinearLayout>

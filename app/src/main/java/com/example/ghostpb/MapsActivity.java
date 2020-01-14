@@ -11,11 +11,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -61,6 +64,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean currentlyMakingARoute;
 
 
+    //variable for working with periodic location updates provided by the fused location provider;
+    private LocationCallback locationCallback;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,11 +80,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
 
+        //callback for when the location data of the user is available when they are making a route
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if(locationResult == null) {
+                    return;
+                }
+
+                //for each location that is in the callback
+                for(Location location : locationResult.getLocations()) {
+                    //save the location
+                    //Log.d("Route", "latitude: " + location.getLatitude() + "longitude: " + location.getLongitude());
+
+                }
+
+            };
+        };
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used. (i.e building the map here)
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
 
 
     /**
@@ -124,6 +151,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //set the active switch to on
         activeSwitch.setChecked(true);
 
+        //change the text associated with the active toggle
+        activeSwitch.setText("Active");
+
 
 
 
@@ -162,6 +192,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
+
+    }
+
+    //this function responds to when the user hits the active toggle
+    public void onToggle(View view) {
+
+        Switch activeSwitch = findViewById(R.id.activeSwitch);
+
+        //if the user hit the toggle from offline to go online
+        if(activeSwitch.isChecked() == true) {
+
+            Log.d("Route", "The user is active");
+
+        //the user hit the toggle to go from online to offline
+        } else {
+
+            //update the text associated with the switch
+            activeSwitch.setText("Offline");
+
+            Log.d("Route", "The user is not active");
+
+        }
 
     }
 
