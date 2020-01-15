@@ -11,11 +11,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
@@ -33,8 +39,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -64,6 +73,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean currentlyMakingARoute;
 
 
+
+
+    //variables used for working with the timer functionality
+    //int to hold the seconds since started timing
+    private int time;
+    //the textview that displays the time
+    private TextView timer;
+    //the thread pushing the updates to the textview
+    Thread timerThread;
+
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
 
@@ -72,12 +91,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //retrieve content view that renders the map
 
+        //retrieve content view that renders the map
         setContentView(R.layout.activity_maps);
 
         //construct the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //set the timer variable
+        timer = findViewById(R.id.timerChronometer);
+
+
+        //create the thread and runnable that will be used to drive the timer, and the updates to the timer TextView
+        timerThread = new Thread() {
+
+            @Override
+            public void run() {
+
+                //
+                while(!isInterrupted()) {
+
+
+                    try {
+                        //run this threads code every second
+                        Thread.sleep(1000);
+
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                //increment the time elapsed
+                                time++;
+
+                                //update the TextView
+                                timer.setText(String.valueOf(time));
+                            }
+
+                        });
+
+                    } catch (InterruptedException e) {
+                        //we got interrupted by the user, no more ticking of time
+                        return;
+                    }
+                }
+
+            }
+        };
+
+
+
 
 
         //callback for when the location data of the user is available when they are making a route
@@ -154,11 +216,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //change the text associated with the active toggle
         activeSwitch.setText("Active");
 
-
-
+        //start the thread that pushes the timer and textview updates
+        timerThread.start();
 
     }
-
 
     //this function responds to when the Routes or New Route button has been clicked
     public void onRoutes(View view) {
@@ -184,9 +245,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //set the boolean keeping track of route making status to true
             currentlyMakingARoute = true;
 
+            //get a handle to the new route button
+            Button newRoute = findViewById(R.id.newRouteButton);
+
+            //make it so the new route button is no longer clickable, because they are starting the routing process now
+            newRoute.setClickable(false);
+
             //calls custom function to start routing the route and tracking the users location and time
             startRoute(view);
-
 
 
         }
@@ -205,11 +271,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Log.d("Route", "The user is active");
 
+            //update the text associated with the switch
+            activeSwitch.setText("Active");
+
         //the user hit the toggle to go from online to offline
         } else {
 
             //update the text associated with the switch
             activeSwitch.setText("Offline");
+
+            //stop the thread that is keeping track of the elapsed time
+            timerThread.interrupt();
+
+
 
             Log.d("Route", "The user is not active");
 
