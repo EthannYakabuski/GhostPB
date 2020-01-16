@@ -36,6 +36,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -289,6 +291,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
 
+            //call drawRoute on the route just created
+            drawRoute(routesInformation.get(0));
 
 
             //END: testing only here want to see if the route is being saved properly
@@ -450,6 +454,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.e("Exception: %s", e.getMessage());
             }
         }
+
+    }
+
+
+    private void drawRoute(Route route) {
+
+        for(int i = 1; i < route.getSize(); i++) {
+
+            /**
+            Polyline testLine = mMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(45.3826692, -75.6979663), new LatLng(46.3826692, -75.6979663))
+                    .width(5)
+                    .color(Color.RED));
+             */
+
+
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                    .add(route.getPoint(i-1).getLocation(), route.getPoint(i).getLocation())
+                    .width(5)
+                    .color(Color.RED));
+
+        }
+
 
     }
 
