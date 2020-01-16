@@ -2,6 +2,7 @@ package com.example.ghostpb;
 
 
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -39,8 +40,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
+import java.sql.Array;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
@@ -66,13 +69,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //the last known location of the users device retrieved by the fused location provider
     private Location lastKnowLocation;
 
+    //location of the user for when they are doing a route
+    private Location roamingLocation;
+    private LatLng locationNow;
+    //holds the route points for the route currently being created
+    ArrayList<RoutePoint> routePoints = new ArrayList<>();
+    //holds the number associated with the route you are currently making
+    private int routeNumber = -1;
+
     //default location for when location permissions are not granted
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
 
     //true when user is currently making a new route
     private boolean currentlyMakingARoute;
 
-
+    //array list of routes for holding the information pertaining to the users routes
+    private ArrayList<Route> routesInformation = new ArrayList<>();
 
 
     //variables used for working with the timer functionality
@@ -108,6 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void run() {
 
+
                 //
                 while(!isInterrupted()) {
 
@@ -125,12 +138,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //update the TextView
                                 timer.setText(String.valueOf(time));
+
+
+                                //get the location of the user
+                                try {
+                                    if(boolLocationPermissionGranted) {
+
+                                        updateDeviceLocation(currentlyMakingARoute, time, routeNumber);
+
+
+                                    }
+
+
+
+                                } catch (SecurityException e) {
+                                    if(!(e.getMessage() == null)) {
+                                        Log.e("Exception: %s", e.getMessage());
+                                    }
+                                }
+
+
                             }
 
                         });
 
                     } catch (InterruptedException e) {
                         //we got interrupted by the user, no more ticking of time
+
+                        //reset the time variable and the textview
+                        time = 0;
+                        timer.setText(String.valueOf(time));
                         return;
                     }
                 }
@@ -150,14 +187,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     return;
                 }
 
-                //for each location that is in the callback
-                for(Location location : locationResult.getLocations()) {
-                    //save the location
-                    //Log.d("Route", "latitude: " + location.getLatitude() + "longitude: " + location.getLongitude());
 
-                }
-
-            };
+            }
         };
 
 
@@ -216,6 +247,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //change the text associated with the active toggle
         activeSwitch.setText("Active");
 
+
         //start the thread that pushes the timer and textview updates
         timerThread.start();
 
@@ -233,12 +265,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //bring up the users saved routes
         if(view.getId() == R.id.routesButton) {
 
+
+            //START: testing only here want to see if the route is being saved properly
+            Log.d("ROUTE TEST", " Size of route array: " + routesInformation.size());
+            Log.d("ROUTE TEST", " Size of route in the first spot in the routes array: " + routesInformation.get(0).getSize());
+
+
+            int size;
+            //for each route stored
+            for(int i = 0; i < routesInformation.size(); i++) {
+
+                size = routesInformation.get(i).getSize();
+
+                //for each point in the route stored
+                for(int x = 0; x < size; x++) {
+
+                    Log.d("ROUTE TEST", "Point: " + x + " Latitude: " + routesInformation.get(i).getPoint(x).getLocation().latitude + " Longitude: " + routesInformation.get(i).getPoint(x).getLocation().longitude);
+
+
+
+                }
+
+            }
+
+
+
+
+            //END: testing only here want to see if the route is being saved properly
+
         }
 
         //when the user hits the new route button
         //start the route making process
         if (view.getId() == R.id.newRouteButton) {
 
+            //increment how route number the user is working on
+            routeNumber++;
+
+            routesInformation.add(new Route(routeNumber));
             //tell logcat user is creating a route
             Log.d("Route", "User has clicked new route");
 
@@ -248,8 +312,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //get a handle to the new route button
             Button newRoute = findViewById(R.id.newRouteButton);
 
+            //handle to the regular routes button
+            Button routesButton = findViewById(R.id.routesButton);
+
             //make it so the new route button is no longer clickable, because they are starting the routing process now
             newRoute.setClickable(false);
+            routesButton.setClickable(false);
 
             //calls custom function to start routing the route and tracking the users location and time
             startRoute(view);
@@ -266,8 +334,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Switch activeSwitch = findViewById(R.id.activeSwitch);
 
+        //get a handle to the new route button
+        Button newRoute = findViewById(R.id.newRouteButton);
+
+        //handle to the regular routes button
+        Button routesButton = findViewById(R.id.routesButton);
+
         //if the user hit the toggle from offline to go online
-        if(activeSwitch.isChecked() == true) {
+        if(activeSwitch.isChecked()) {
 
             Log.d("Route", "The user is active");
 
@@ -277,11 +351,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //the user hit the toggle to go from online to offline
         } else {
 
+            //set the buttons to be clickable again
+            newRoute.setClickable(true);
+            routesButton.setClickable(true);
+
             //update the text associated with the switch
             activeSwitch.setText("Offline");
 
             //stop the thread that is keeping track of the elapsed time
             timerThread.interrupt();
+
+
+            //user just finished making a new route, handle this here
+            if(currentlyMakingARoute) {
+                currentlyMakingARoute = false;
+
+
+            }
 
 
 
@@ -290,6 +376,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
 
     //prompt user with box for device location permission
     private void requestLocationPermissions() {
@@ -307,7 +394,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //callback for requestLocationpermissions()
     @Override
-    public void onRequestPermissionsResult(int code, String[] permissions, int[] allowResults) {
+    public void onRequestPermissionsResult(int code,@NonNull String[] permissions,@NonNull int[] allowResults) {
         boolLocationPermissionGranted = false;
 
         switch(code) {
@@ -359,8 +446,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //catch errors
         } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
+            if(!(e.getMessage() == null)) {
+                Log.e("Exception: %s", e.getMessage());
+            }
         }
+
+    }
+
+
+    //this function simply updates the device location and does nothing else
+    //updates the roamingLocation global variable
+
+    private void updateDeviceLocation(final boolean makingARoute, final int timeWhenHappenned, final int routeNum) {
+
+        try {
+            if(boolLocationPermissionGranted) {
+                Task<Location> currentLocation = fusedLocationProviderClient.getLastLocation();
+
+                currentLocation.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    //called when the fusedLocationProviderClient is done finding the last known location
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+
+                        //give coordinates of current location to the camera controlling the view of the map
+                        if(task.isSuccessful()) {
+
+                            //save the result of the task (finding the last known location) to the lastKnowLocation private variable
+                            roamingLocation = task.getResult();
+
+                            //if there was a result
+                            if (roamingLocation != null) {
+                                Log.d("Route", "Roaming location updated");
+
+                                locationNow = new LatLng(roamingLocation.getLatitude(), roamingLocation.getLongitude());
+                                //if the user is currently making a route, add this information to the temporary store of the route points
+                                if(makingARoute) {
+
+                                    //make a new route point and add it to the temporary structure
+                                    routesInformation.get(routeNum).addPoint(new RoutePoint(locationNow, timeWhenHappenned));
+
+                                }
+
+
+                            } else {
+                                Log.d("Route", "Problem updating roaming location");
+                            }
+
+                        }
+
+
+                    }
+
+                });
+
+
+            }
+
+            //catch errors
+        } catch (SecurityException e) {
+            if(!(e.getMessage() == null)) {
+                Log.e("Exception: %s", e.getMessage());
+            }
+        }
+
+
 
     }
 
@@ -374,7 +523,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 currentLocation.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     //called when the fusedLocationProviderClient is done finding the last known location
                     @Override
-                    public void onComplete(Task<Location> task) {
+                    public void onComplete(@NonNull Task<Location> task) {
 
                         //give coordinates of current location to the camera controlling the view of the map
                         if(task.isSuccessful()) {
@@ -387,15 +536,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //move the camera to the last known location
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM));
-
-                                /**
-                                //add a 5 meter circle around the users location
-                                Circle userCircle = mMap.addCircle(new CircleOptions()
-                                        .center(new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()))
-                                        .radius(5)
-                                        .strokeColor(Color.RED)
-                                        .fillColor(Color.BLUE));
-                                 */
 
                             }
 
@@ -418,7 +558,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //catch errors
         } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
+            if(!(e.getMessage() == null)) {
+                Log.e("Exception: %s", e.getMessage());
+            }
         }
 
 
