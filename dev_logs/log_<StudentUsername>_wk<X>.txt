@@ -1,0 +1,4 @@
+Users must follow the file format.
+
+where StudentUsername is the student's user account in the repo, and X is week's ID (e.g., wk1)). 
+Starting January 20, there will be 12 weeks, thus, each member is to submit 12 weekly logs.
