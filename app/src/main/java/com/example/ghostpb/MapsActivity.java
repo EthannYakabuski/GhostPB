@@ -85,6 +85,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //true when user is currently making a new route
     private boolean currentlyMakingARoute;
 
+    //access to the chronometer
+    private Chronometer timerFunctionality;
+    private boolean chronometerRunning;
+
+
+
     //array list of routes for holding the information pertaining to the users routes
     private ArrayList<Route> routesInformation = new ArrayList<>();
 
@@ -112,72 +118,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //construct the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        //set the chronometer variable used for stopwatch functionality
+        timerFunctionality = findViewById(R.id.timerChronometer);
+        timerFunctionality.setFormat("Time: %s");
+        timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
+
+        //the function that is called every second when the chronometer ticks
+        //in our case we cant to update the users location and save the route point to the proper route in the backing arraylist
+        timerFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+
+
+                long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
+
+                
+                updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
+
+            }
+        });
+
         //set the timer variable
         timer = findViewById(R.id.timerChronometer);
 
+        Switch activeSwitch = findViewById(R.id.activeSwitch);
 
-        //create the thread and runnable that will be used to drive the timer, and the updates to the timer TextView
-        timerThread = new Thread() {
-
-            @Override
-            public void run() {
-
-
-                //
-                while(!isInterrupted()) {
-
-
-                    try {
-                        //run this threads code every second
-                        Thread.sleep(1000);
-
-                        runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                //increment the time elapsed
-                                time++;
-
-                                //update the TextView
-                                timer.setText(String.valueOf(time));
-
-
-                                //get the location of the user
-                                try {
-                                    if(boolLocationPermissionGranted) {
-
-                                        updateDeviceLocation(currentlyMakingARoute, time, routeNumber);
-
-
-                                    }
-
-
-
-                                } catch (SecurityException e) {
-                                    if(!(e.getMessage() == null)) {
-                                        Log.e("Exception: %s", e.getMessage());
-                                    }
-                                }
-
-
-                            }
-
-                        });
-
-                    } catch (InterruptedException e) {
-                        //we got interrupted by the user, no more ticking of time
-
-                        //reset the time variable and the textview
-                        time = 0;
-                        timer.setText(String.valueOf(time));
-                        return;
-                    }
-                }
-
-            }
-        };
-
-
+        activeSwitch.setChecked(false);
+        activeSwitch.setClickable(false);
 
 
 
@@ -251,7 +219,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         //start the thread that pushes the timer and textview updates
-        timerThread.start();
+        //timerThread.start();
+
+
+        //start the timer
+        timerFunctionality.setBase(SystemClock.elapsedRealtime());
+        timerFunctionality.start();
+
+
+
+        currentlyMakingARoute = true;
+
+
+    }
+
+
+    //this function responds to when the stop button is pressed
+    public void onStop(View view) {
+
+        //handle to the toggle
+        Switch activeSwitch = findViewById(R.id.activeSwitch);
+
+        //get a handle to the new route button
+        Button newRoute = findViewById(R.id.newRouteButton);
+
+        //handle to the regular routes button
+        Button routesButton = findViewById(R.id.routesButton);
+
+        //set the buttons to be clickable again
+        newRoute.setClickable(true);
+        routesButton.setClickable(true);
+
+        //update the text associated with the switch
+        activeSwitch.setText("Offline");
+        //change the state of the toggle
+        activeSwitch.setChecked(false);
+
+        //stop the thread that is keeping track of the elapsed time
+        //timerThread.interrupt();
+
+        //stop the timer
+        timerFunctionality.stop();
+
+        timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
+        //user just finished making a new route, handle this here
+        if(currentlyMakingARoute) {
+            currentlyMakingARoute = false;
+
+
+        }
+
+
+
+        Log.d("Route", "The user is not active");
+
+
 
     }
 
@@ -282,7 +305,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //for each point in the route stored
                 for(int x = 0; x < size; x++) {
 
-                    Log.d("ROUTE TEST", "Point: " + x + " Latitude: " + routesInformation.get(i).getPoint(x).getLocation().latitude + " Longitude: " + routesInformation.get(i).getPoint(x).getLocation().longitude);
+                    Log.d("ROUTE TEST", "Time: " + routesInformation.get(i).getPoint(x).getTime() + " Point: " + x + " Latitude: " + routesInformation.get(i).getPoint(x).getLocation().latitude + " Longitude: " + routesInformation.get(i).getPoint(x).getLocation().longitude);
 
 
 
@@ -293,6 +316,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //call drawRoute on the route just created
             drawRoute(routesInformation.get(0));
+
+
+            //call draw routes on all the routes created
+            for(int z = 0; z < routesInformation.size(); z++) {
+
+                Log.d("ROUTE TEST", "Drawing a route");
+
+
+                drawRoute(routesInformation.get(z));
+            }
 
 
             //END: testing only here want to see if the route is being saved properly
@@ -313,11 +346,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //set the boolean keeping track of route making status to true
             currentlyMakingARoute = true;
 
+            //handle to the active switch
+            Switch activeSwitch = findViewById(R.id.activeSwitch);
+
             //get a handle to the new route button
             Button newRoute = findViewById(R.id.newRouteButton);
 
             //handle to the regular routes button
             Button routesButton = findViewById(R.id.routesButton);
+
+            //handle to the stop button
+            Button stopButton = findViewById(R.id.stopButton);
+
+            //change the text of the toggle
+            activeSwitch.setText("Active");
+            //change the state of the toggle
+            activeSwitch.setChecked(true);
+
+            //when the user is creating a new route
+            stopButton.setVisibility(View.VISIBLE);
+
 
             //make it so the new route button is no longer clickable, because they are starting the routing process now
             newRoute.setClickable(false);
@@ -336,48 +384,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this function responds to when the user hits the active toggle
     public void onToggle(View view) {
 
-        Switch activeSwitch = findViewById(R.id.activeSwitch);
-
-        //get a handle to the new route button
-        Button newRoute = findViewById(R.id.newRouteButton);
-
-        //handle to the regular routes button
-        Button routesButton = findViewById(R.id.routesButton);
-
-        //if the user hit the toggle from offline to go online
-        if(activeSwitch.isChecked()) {
-
-            Log.d("Route", "The user is active");
-
-            //update the text associated with the switch
-            activeSwitch.setText("Active");
-
-        //the user hit the toggle to go from online to offline
-        } else {
-
-            //set the buttons to be clickable again
-            newRoute.setClickable(true);
-            routesButton.setClickable(true);
-
-            //update the text associated with the switch
-            activeSwitch.setText("Offline");
-
-            //stop the thread that is keeping track of the elapsed time
-            timerThread.interrupt();
-
-
-            //user just finished making a new route, handle this here
-            if(currentlyMakingARoute) {
-                currentlyMakingARoute = false;
-
-
-            }
-
-
-
-            Log.d("Route", "The user is not active");
-
-        }
 
     }
 
@@ -484,7 +490,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this function simply updates the device location and does nothing else
     //updates the roamingLocation global variable
 
-    private void updateDeviceLocation(final boolean makingARoute, final int timeWhenHappenned, final int routeNum) {
+    private void updateDeviceLocation(final boolean makingARoute, final long timeWhenHappenned, final int routeNum) {
 
         try {
             if(boolLocationPermissionGranted) {
@@ -510,7 +516,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if(makingARoute) {
 
                                     //make a new route point and add it to the temporary structure
-                                    routesInformation.get(routeNum).addPoint(new RoutePoint(locationNow, timeWhenHappenned));
+                                    routesInformation.get(routeNumber).addPoint(new RoutePoint(locationNow, timeWhenHappenned));
 
                                 }
 

@@ -13,7 +13,7 @@ public class RoutePoint {
     //holds the latitude and longitude of the user when this route point was created
     private LatLng location;
     //holds a time object that was created when the user was at the above location
-    private int timeAtLocation;
+    private long timeAtLocation;
 
     //returns the LatLng object private variable location
     LatLng getLocation() {
@@ -22,14 +22,14 @@ public class RoutePoint {
     }
 
     //returns the Time object associated with the above LatLng object
-    public int getTime() {
+    public long getTime() {
 
         return timeAtLocation;
 
     }
 
     //constructor
-    RoutePoint(LatLng latLngObj, int time) {
+    RoutePoint(LatLng latLngObj, long time) {
 
         location = latLngObj;
         timeAtLocation = time;

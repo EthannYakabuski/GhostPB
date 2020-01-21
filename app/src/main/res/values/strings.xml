@@ -7,4 +7,5 @@
     <string name="ghost_data_button">Ghost Times</string>
     <string name="online_button">Offline</string>
     <string name="default_time">00:00</string>
+    <string name="stop_button_good">STOP</string>
 </resources>
