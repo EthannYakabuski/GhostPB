@@ -90,10 +90,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean chronometerRunning;
 
 
+    //variables used to help draw the route live
+    private LatLng lastPoint = new LatLng(0, 0);
 
     //array list of routes for holding the information pertaining to the users routes
     private ArrayList<Route> routesInformation = new ArrayList<>();
 
+    //array of the drawn polylines on the map
+    private ArrayList<Polyline> polyLines = new ArrayList<>();
 
     //variables used for working with the timer functionality
     //int to hold the seconds since started timing
@@ -133,7 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
-                
+                //call the custom function to update users location and store route information
                 updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
 
             }
@@ -201,7 +205,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    //this function is called when the user hits the clear button
+    public void onClear(View view) {
 
+        Log.d("ROUTE", "Clearing the map");
+
+        clearMap();
+    }
+
+    //this function clears everything that has been drawn on the map so far
+    public void clearMap() {
+
+        //for each polyline that has been drawn to the map
+        for(int i = 0; i < polyLines.size(); i++) {
+
+            //remove the polyline stored at this index
+            polyLines.get(i).remove();
+        }
+
+        //empty the array holding the drawn polylines
+        polyLines.clear();
+        //mMap.clear();
+    }
+
+
+
+    //this custom function draws the route live while the user is making it
+    public void drawRouteLive(LatLng previous, LatLng current) {
+
+
+        //if there is actual information in the last point
+        if (!(previous.longitude == 0)) {
+            //draws the poly line on the map between the previous point and the current point
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                    .add(previous, current)
+                    .width(5)
+                    .color(Color.BLUE));
+
+            polyLines.add(line);
+        }
+    }
     //this function will start requesting the users location every second and saving
     //LatLng objects along with time information to create ghost data at the end of the session
     public void startRoute(View view) {
@@ -481,14 +524,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .width(5)
                     .color(Color.RED));
 
+            polyLines.add(line);
         }
 
 
     }
 
 
-    //this function simply updates the device location and does nothing else
+    //this function updates the device location and saves the point to the associated route
     //updates the roamingLocation global variable
+    //
 
     private void updateDeviceLocation(final boolean makingARoute, final long timeWhenHappenned, final int routeNum) {
 
@@ -513,6 +558,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 locationNow = new LatLng(roamingLocation.getLatitude(), roamingLocation.getLongitude());
                                 //if the user is currently making a route, add this information to the temporary store of the route points
+
+                                drawRouteLive(lastPoint, locationNow);
+
+                                lastPoint = locationNow;
+
                                 if(makingARoute) {
 
                                     //make a new route point and add it to the temporary structure

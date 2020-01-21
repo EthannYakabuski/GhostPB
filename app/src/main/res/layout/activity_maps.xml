@@ -50,8 +50,20 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
             android:onClick="onStop"
             android:text="@string/stop_button_good" />
+
+        <Button
+            android:id="@+id/clearMapButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            android:onClick="onClear"
+            android:text="@string/clear_map" />
 
 
     </LinearLayout>
