@@ -6,6 +6,7 @@ public class Route {
 
     private ArrayList<RoutePoint> routePoints = new ArrayList<>();
     private int routeID;
+    private String routeName;
 
     //adds the given RoutePoint object to the backing arraylist
     void addPoint(RoutePoint p) {
@@ -17,6 +18,7 @@ public class Route {
     }
 
     int getSize() { return routePoints.size(); }
+    String getName() { return routeName; }
 
 
     //sets the backing arraylist to the given arraylist of RoutePoints
@@ -32,5 +34,6 @@ public class Route {
     public Route(ArrayList<RoutePoint> rp, int id) {
         routePoints = rp;
         routeID = id;
+        routeName = "Route "+ id;
     }
 }
