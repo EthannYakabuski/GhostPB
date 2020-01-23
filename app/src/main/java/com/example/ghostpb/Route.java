@@ -20,20 +20,20 @@ public class Route {
     int getSize() { return routePoints.size(); }
     String getName() { return routeName; }
 
+    void setName(String rN) { routeName = rN; }
 
     //sets the backing arraylist to the given arraylist of RoutePoints
     public void setAllRoutePoints(ArrayList<RoutePoint> rp) {
         routePoints = rp;
     }
 
-
-
     Route(int id) {
         routeID = id;
+        routeName = "Route " + Integer.toString(id);
     }
     public Route(ArrayList<RoutePoint> rp, int id) {
         routePoints = rp;
         routeID = id;
-        routeName = "Route "+ id;
+        routeName = "Route " + Integer.toString(id);
     }
 }
