@@ -21,5 +21,6 @@ You can run phone emulators via the AVD manager of Android Studio
 
 
 MapsActivity.java is the main activity for the application, and where most of the functionality is
-activity_maps.xml is the layout file for the main activity of the application
+
+Activity_maps.xml is the layout file for the main activity of the application
 
