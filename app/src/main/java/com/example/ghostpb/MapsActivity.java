@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -18,9 +19,13 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -96,6 +101,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //array list of routes for holding the information pertaining to the users routes
     private ArrayList<Route> routesInformation = new ArrayList<>();
 
+    private ArrayList<String> routesNames = new ArrayList<>();
+
     //array of the drawn polylines on the map
     private ArrayList<Polyline> polyLines = new ArrayList<>();
 
@@ -109,6 +116,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
+
+    public static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
 
 
     @Override
@@ -230,6 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
+
     //this custom function draws the route live while the user is making it
     public void drawRouteLive(LatLng previous, LatLng current) {
 
@@ -276,6 +286,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    //updates the array holding the route names in order to send this information along with the intent to make a new
+    //activity when the routes button is clicked
+    public void updateNamesArray() {
+
+        //first clear the array holding the name information from any previous clicks of routes button
+        routesNames.clear();
+
+        //for each route that is stored save that name information in the routeNames array
+        for(int i = 0; i < routesInformation.size(); i++) {
+
+            routesNames.add(routesInformation.get(i).getName());
+
+
+        }
+    }
+
 
     //this function responds to when the stop button is pressed
     public void onStop(View view) {
@@ -304,7 +330,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //stop the timer
         timerFunctionality.stop();
 
+        //reset the variable keeping track of user location for live drawing of their route
+        lastPoint = new LatLng(0, 0);
+
+
+        //reset the timer
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
+
+
+
 
         //user just finished making a new route, handle this here
         if(currentlyMakingARoute) {
@@ -329,15 +364,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d("Route", "view.getId() = " + view.getId());
         Log.d("Route", "R.id.routesButton = " + R.id.routesButton);
 
+
+
         //when the user hits the routes button
         //bring up the users saved routes
         if(view.getId() == R.id.routesButton) {
 
+            //start a new activity (a new screen on the app) that shows all of the available routes to select
 
+            //make a new intent
+            Intent intent = new Intent(this, displayAvailableRoutesActivity.class);
+            TextView activeRouteLabel = findViewById(R.id.activeRouteLabel);
+
+            //update the local variable holding the names of the routes
+            updateNamesArray();
+
+            //add the array of names of the routes to the new intent
+            intent.putExtra("arrayNames", routesNames);
+
+            //start the new window activity passing along the intent we just created
+            startActivity(intent);
+
+            /*
             //START: testing only here want to see if the route is being saved properly
             Log.d("ROUTE TEST", " Size of route array: " + routesInformation.size());
-            Log.d("ROUTE TEST", " Size of route in the first spot in the routes array: " + routesInformation.get(0).getSize());
-
 
             int size;
             //for each route stored
@@ -356,11 +406,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
-
-            //call drawRoute on the route just created
-            drawRoute(routesInformation.get(0));
-
-
             //call draw routes on all the routes created
             for(int z = 0; z < routesInformation.size(); z++) {
 
@@ -372,6 +417,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             //END: testing only here want to see if the route is being saved properly
+
+             */
 
         }
 

@@ -4,15 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-     >
+    android:orientation="vertical">
 
     <!--this fragment holds the map    -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="305dp"
         tools:context=".MapsActivity" />
 
 
@@ -72,12 +71,11 @@
         android:id="@+id/activeSwitch"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
-        android:text="@string/online_button"
         android:onClick="onToggle"
-        android:layout_marginStart="5dp"
-        />
+        android:text="@string/online_button" />
 
     <Chronometer
         android:id="@+id/timerChronometer"
@@ -86,10 +84,16 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:textColor="@android:color/black"
         android:textAlignment="center"
+        android:textColor="@android:color/black"
         android:textSize="20dp" />
 
+    <TextView
+        android:id="@+id/activeRouteLabel"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textColor="@android:color/black"
+        android:textSize="20dp"/>
 
 
 </LinearLayout>
