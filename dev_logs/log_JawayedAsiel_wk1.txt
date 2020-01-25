@@ -1,1 +1,3 @@
 Spent 2 hours reading and making sense of code.
+Spent 30 mins trying to figure out why I couldn't git clone this repo. Figured out it was cuz of the template log file I left in xd
+(Does that count as time towards the project?)
