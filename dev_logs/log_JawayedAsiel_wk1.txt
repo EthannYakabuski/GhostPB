@@ -1,3 +1,5 @@
 Spent 2 hours reading and making sense of code.
 Spent 30 mins trying to figure out why I couldn't git clone this repo. Figured out it was because of the template log file I left in xd
 (Does that count as time towards the project?)
+Spent an hour working on an icon for the app.
+Spent an hour changing the array so that it dynamically resizes itself instead of it being static.
