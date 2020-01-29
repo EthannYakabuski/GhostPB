@@ -1,0 +1,10 @@
+30 minutes:
+   Located and gathered saved resources I have that may be useful during the development of the project. Old code, notes, etc.
+30 minutes:
+   Refreshed myself on some Android development concepts.
+3 hours:
+   Setting up a working version of the project for Mac and Windows (Windows failing in the end due to certain device restrictions). Various installations (Android Studio and other components) and error solving. Some errors include storage, gradle, MacOS changes with Catalina, and command line tools.
+1 hour:
+   Testing and understanding the code of the current state of the project.
+   Brainstormed from the current design ways we can put together our code early on in a way that could improve performance before getting too deep into it. 
+   Thinking about Android Layouts such as the current Linear Layouts versus changing to Constraint Layouts, and the use of asychornous event listeners.
