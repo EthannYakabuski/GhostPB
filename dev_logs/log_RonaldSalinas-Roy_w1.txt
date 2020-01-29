@@ -7,4 +7,4 @@
 1 hour:
    Testing and understanding the code of the current state of the project.
    Brainstormed from the current design ways we can put together our code early on in a way that could improve performance before getting too deep into it. 
-   Thinking about Android Layouts such as the current Linear Layouts versus changing to Constraint Layouts, and the use of asychornous event listeners.
+   Thinking about Android Layouts such as the current Linear Layouts versus changing to Constraint Layouts, and the use of asychornous event listeners. 
