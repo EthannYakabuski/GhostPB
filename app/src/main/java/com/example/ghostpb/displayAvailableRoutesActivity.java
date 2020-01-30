@@ -21,7 +21,9 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display_available_routes);
 
         //user can store up to ten names
-        String[] routeNamesFormatted = new String[10];
+
+        routeArray routeNamesFormatted = new routeArray(10);
+        //String[] routeNamesFormatted = new String[10];
 
         //get a handle to the listview holding the names of the routes
         final ListView listView = findViewById(R.id.listViewRouteNames);
@@ -36,15 +38,17 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
 
         for(int i = 0; i < routeNames.size(); i++) {
 
-            routeNamesFormatted[i] = routeNames.get(i);
+            //I don't know why this isn't allowed vvv
+            routeNamesFormatted.s[i].push(routeNames.get(i));
+            //routeNamesFormatted = routeNames.get(i);
 
             Log.d("ROUTE", "Adding route name: " + routeNames.get(i));
-
 
         }
 
         //make an array adapter to add items to the list view from the routeNames array
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, routeNamesFormatted);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, routeNamesFormatted.s);
+        //ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, routeNamesFormatted);
 
         //link the list view to the adapter
         listView.setAdapter(adapter);
