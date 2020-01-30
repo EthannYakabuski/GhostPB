@@ -39,7 +39,7 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
         for(int i = 0; i < routeNames.size(); i++) {
 
             //I don't know why this isn't allowed vvv
-            routeNamesFormatted.s[i].push(routeNames.get(i));
+            routeNamesFormatted.push(routeNames.get(i));
             //routeNamesFormatted = routeNames.get(i);
 
             Log.d("ROUTE", "Adding route name: " + routeNames.get(i));
