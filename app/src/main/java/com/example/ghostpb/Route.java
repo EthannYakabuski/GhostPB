@@ -21,6 +21,7 @@ public class Route {
     String getName() { return routeName; }
 
     void setName(String rN) { routeName = rN; }
+    void setRoutePoints(ArrayList<RoutePoint> rp) { routePoints = rp; }
 
     //sets the backing arraylist to the given arraylist of RoutePoints
     public void setAllRoutePoints(ArrayList<RoutePoint> rp) {
@@ -35,5 +36,9 @@ public class Route {
         routePoints = rp;
         routeID = id;
         routeName = "Route " + Integer.toString(id);
+    }
+    public Route(String name) {
+        routeID = 9001;
+        routeName = name;
     }
 }
