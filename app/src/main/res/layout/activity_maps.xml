@@ -88,6 +88,15 @@
         android:textColor="@android:color/black"
         android:textSize="20dp" />
 
+    <Chronometer
+        android:id="@+id/ghostChronometer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        />
+
+
+
     <TextView
         android:id="@+id/activeRouteLabel"
         android:layout_width="match_parent"

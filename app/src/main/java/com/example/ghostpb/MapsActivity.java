@@ -94,6 +94,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Chronometer timerFunctionality;
     private boolean chronometerRunning;
 
+    //access to the chronometer driving the ghost animation
+    private Chronometer ghostFunctionality;
+    private boolean ghostRunning;
 
     //variables used to help draw the route live
     private LatLng lastPoint = new LatLng(0, 0);
@@ -106,13 +109,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //array of the drawn polylines on the map
     private ArrayList<Polyline> polyLines = new ArrayList<>();
 
-    //variables used for working with the timer functionality
-    //int to hold the seconds since started timing
-    private int time;
-    //the textview that displays the time
-    private TextView timer;
-    //the thread pushing the updates to the textview
-    Thread timerThread;
+    //array of 'simulated' routes, used for DEMO D2
+    //simulated routes can be created by using this resource: https://getlatlong.net
+    private ArrayList<Route> demoRoutes = new ArrayList<>();
+
+
+    //variable for holding the route the ghost is currently navigating
+    private Route activeGhostRoute;
+
 
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
@@ -137,6 +141,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
 
+        ghostFunctionality = findViewById(R.id.ghostChronometer);
+        ghostFunctionality.setBase(SystemClock.elapsedRealtime());
+
+
+        //add the routes for DEMO D2
+        populateDemoRoutes();
+
         //the function that is called every second when the chronometer ticks
         //in our case we cant to update the users location and save the route point to the proper route in the backing arraylist
         timerFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -152,8 +163,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        //set the timer variable
-        timer = findViewById(R.id.timerChronometer);
+
+        //the function that is called every second to update the ghost location on the map
+        ghostFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+
+                long elapsedMillis = SystemClock.elapsedRealtime() - ghostFunctionality.getBase();
+
+                updateGhostLocation(activeGhostRoute, elapsedMillis);
+            }
+        });
+
 
         Switch activeSwitch = findViewById(R.id.activeSwitch);
 
@@ -210,6 +231,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //finds the phone and sets the map to go to users current location
         showDeviceLocation();
+
+
+        //show demo route
+        //showDemoRoutes();
+
+    }
+
+
+    public void showDemoRoutes() {
+
+        for(int i = 0; i < demoRoutes.size(); i++) {
+            drawRoute(demoRoutes.get(i));
+        }
+    }
+
+
+    //this function populates the 'simulated' routes for use with DEMO D2
+    //simulated routes can be created by using this resource: https://getlatlong.net
+    public void populateDemoRoutes() {
+
+
+        Route campusAveLoop = new Route("Campus Ave Loop");
+
+        //draws a line down Campus ave. Carleton University -- continue later
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385408, -75.696361), 1));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385378, -75.696359), 2));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385310,-75.696372), 3));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385250, -75.696364), 4));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385197, -75.696367), 5));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385125, -75.696364), 6));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385065,-75.696361), 7));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384990, -75.696364), 8));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384922, -75.696361), 9));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384877, -75.696364), 10));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384820, -75.696372), 11));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384752, -75.696370), 12));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384647, -75.696367), 13));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384587, -75.696364), 14));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384492, -75.696356), 15));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384440, -75.696353), 16));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384370, -75.696364), 17));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384291, -75.696351),18));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384238, -75.696348), 19));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384174, -75.696351), 20));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384129,-75.696353 ), 21));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384080,-75.696345 ), 21));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383997,-75.696337 ), 22));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383941, -75.696340), 23));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383903, -75.696332), 24));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383835,-75.696329 ), 25));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383782, -75.696311), 26));
+
+        demoRoutes.add(campusAveLoop);
 
 
     }
@@ -573,6 +647,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             polyLines.add(line);
         }
+
+
+    }
+
+
+    //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
+    private void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
+
+        //search through currentRoute to find the RoutePoint associated with timeWhenHappenned
+        for(int i = 0; i < currentRoute.getSize(); i++) {
+
+            //this is the appropriate place to draw the ghost
+            if(currentRoute.getPoint(i).getTime() == timeWhenHappenned) {
+
+                //extract the location information from the appropriate route point
+                LatLng ghostLocation = new LatLng(currentRoute.getPoint(i).getLocation().latitude, currentRoute.getPoint(i).getLocation().longitude);
+
+                //draw the circle using google maps api 'circle' function
+
+
+            }
+
+        }
+
 
 
     }
