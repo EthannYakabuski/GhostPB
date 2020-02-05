@@ -1,0 +1,10 @@
+1.5 hours:
+	Debugging a crash issue that was happening on emulators when switching activities. Cause determined to be from 	
+  	the string array parameter in the Adapter. Brainstormed changes.
+2.5 hours:
+	Studied the code further. Looked on how to fix little errors and thought about any needs for error handling.
+  	Studied switches.
+	Translated functions to make use of event listeners.
+	Tidied up some code.
+	Replaced repetitive use of string literals with variables, and made use of XML string resources.
+	Some commenting.

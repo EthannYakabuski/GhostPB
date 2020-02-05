@@ -1,0 +1,19 @@
+WEEK 3: Februay 3rd - February 9th
+
+TODO this week due February 9th - appx 5 hours detailed below
+
+BUG: appx 1 hour
+Finalize implementation details to ensure no null strings are being passed to array adapter
+ - test on an emulated phone after fixing bios settings to laptop
+
+FEATURE: appx 2 hours
+Ghost animation
+Begin on skeleton method that allows the ghost (for now a google maps api 'Circle'), to animate itself along the given route
+
+//animates ghost along the given route, according to the time information that is saved within the route given
+void .... animateGhost(Route route) { }
+
+GROUP MEETING: appx 2 hours
+Group meeting is scheduled to meet in our library room on Thursday February 6th
+
+

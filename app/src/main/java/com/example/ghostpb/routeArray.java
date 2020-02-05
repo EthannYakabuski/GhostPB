@@ -17,8 +17,8 @@ public class routeArray {
     private int getSize() {return size;}
 
     //double capacity of the array
-    private void doubleSize() {
-        capacity *= 2;
+    private void addOneSize() {
+        capacity = capacity+1;
         String[] copy = new String[capacity];
         for (int i = 0; i < size; i++) {
             copy[i] = s[i];
@@ -29,7 +29,7 @@ public class routeArray {
     //Add new element to end
     public void push(String element) {
         if (isFull()) {
-            doubleSize();
+            addOneSize();
         }
         s[size] = element;
         size++;

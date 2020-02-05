@@ -22,7 +22,7 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
 
         //user can store up to ten names
 
-        routeArray routeNamesFormatted = new routeArray(10);
+        //routeArray routeNamesFormatted = new routeArray(10);
         //String[] routeNamesFormatted = new String[10];
 
         //get a handle to the listview holding the names of the routes
@@ -34,14 +34,16 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
         //receive the array list of route names from the intent
         ArrayList<String> routeNames = (ArrayList<String>) intent.getSerializableExtra("arrayNames");
 
+        //allocated the size equal the the amount of string names provided by the intent
+        //String[] routeNamesFormatted = new String[routeNames.size()];
+
+        routeArray routeNamesFormatted = new routeArray(routeNames.size());
+
         Log.d("ROUTE", "Route Names size = " + routeNames.size());
 
         for(int i = 0; i < routeNames.size(); i++) {
 
-            //I don't know why this isn't allowed vvv
             routeNamesFormatted.push(routeNames.get(i));
-            //routeNamesFormatted = routeNames.get(i);
-            
 
             Log.d("ROUTE", "Adding route name: " + routeNames.get(i));
 

@@ -1,0 +1,3 @@
+3 hours reading/watching videos related to android studio and java
+4 hours Working on creating objects related to time and add that data structure to the route class
+1 hour troubleshooting issues with app on mobile
