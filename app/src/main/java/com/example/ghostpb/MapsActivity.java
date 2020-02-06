@@ -238,7 +238,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 clearMap();
             }
         });
-
+ 
         // When the Routes button is pressed, brings up the saved routes
         routesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
