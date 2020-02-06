@@ -121,7 +121,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
 
+    //buttons for the click event listeners
+    private Button clearBtn;
+    private Button stopBtn;
+    private Button routesBtn;
+    private Button newRouteBtn;
+    private Switch activeSwitch;
+
     public static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
+    public static final String ROUTE_TAG = "ROUTE";
+    public static final String TEST_TAG = "ROUTE TEST";
 
 
     @Override
@@ -131,6 +140,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //retrieve content view that renders the map
         setContentView(R.layout.activity_maps);
+
+        // Widgets for the click event listeners
+        clearBtn     = (Button) findViewById(R.id.clearMapButton);
+        stopBtn      = (Button) findViewById(R.id.stopButton);
+        routesBtn    = (Button) findViewById(R.id.routesButton);
+        newRouteBtn  = (Button) findViewById(R.id.newRouteButton);
+        activeSwitch = (Switch) findViewById(R.id.activeSwitch);
 
         //construct the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -176,11 +192,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-        Switch activeSwitch = findViewById(R.id.activeSwitch);
-
         activeSwitch.setChecked(false);
         activeSwitch.setClickable(false);
-
 
 
         //callback for when the location data of the user is available when they are making a route
@@ -200,6 +213,136 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // When the Stop button is pressed
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(ROUTE_TAG, "Stop button clicked");
+
+                //set the buttons to be clickable again
+                routesBtn.setClickable(true);
+                newRouteBtn.setClickable(true);
+
+                //update the text associated with the switch
+                activeSwitch.setText(R.string.switch_offline);
+                //change the state of the toggle
+                activeSwitch.setChecked(false);
+
+                //stop the thread that is keeping track of the elapsed time
+                //timerThread.interrupt();
+
+                //stop the timer
+                timerFunctionality.stop();
+
+                //reset the variable keeping track of user location for live drawing of their route
+                lastPoint = new LatLng(0, 0);
+
+                //reset the timer
+                timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
+                //user just finished making a new route, handle this here
+                if(currentlyMakingARoute) {
+                    currentlyMakingARoute = false;
+                }
+
+                Log.d(ROUTE_TAG, "The user is not active");
+            }
+        });
+
+        // When the Clear button is pressed
+        clearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(ROUTE_TAG, "Clear button clicked");
+
+                clearMap();
+            }
+        });
+ 
+        // When the Routes button is pressed, brings up the saved routes
+        routesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //start a new activity (a new screen on the app) that shows all of the available routes to select
+
+                Log.d(ROUTE_TAG, "Routes button clicked");
+                //make a new intent
+                Intent intent = new Intent(MapsActivity.this, displayAvailableRoutesActivity.class);
+                TextView activeRouteLabel = findViewById(R.id.activeRouteLabel);
+
+                //update the local variable holding the names of the routes
+                updateNamesArray();
+
+                //add the array of names of the routes to the new intent
+                intent.putExtra("arrayNames", routesNames);
+
+                //start the new window activity passing along the intent we just created
+                startActivity(intent);
+
+                /*
+                //START: testing only here want to see if the route is being saved properly
+                Log.d("TEST_TAG", " Size of route array: " + routesInformation.size());
+
+                int size;
+                //for each route stored
+                for(int i = 0; i < routesInformation.size(); i++) {
+
+                    size = routesInformation.get(i).getSize();
+
+                    //for each point in the route stored
+                    for(int x = 0; x < size; x++) {
+
+                        Log.d("TEST_TAG", "Time: " + routesInformation.get(i).getPoint(x).getTime() + " Point: " + x + " Latitude: " + routesInformation.get(i).getPoint(x).getLocation().latitude + " Longitude: " + routesInformation.get(i).getPoint(x).getLocation().longitude);
+
+                    }
+                }
+
+                //call draw routes on all the routes created
+                for(int z = 0; z < routesInformation.size(); z++) {
+
+                    Log.d("TEST_TAG", "Drawing a route");
+
+                    drawRoute(routesInformation.get(z));
+                }
+
+                //END: testing only here want to see if the route is being saved properly
+
+                 */
+            }
+        });
+
+        // When the New Route button is pressed, starts the route making process
+        newRouteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(ROUTE_TAG, "New Routes button clicked");
+
+                //increment how route number the user is working on
+                routeNumber++;
+
+                routesInformation.add(new Route(routeNumber));
+
+                //set the boolean keeping track of route making status to true
+                currentlyMakingARoute = true;
+
+                //change the text of the toggle
+                activeSwitch.setText(R.string.switch_active);
+                //change the state of the toggle
+                activeSwitch.setChecked(true);
+
+                //when the user is creating a new route
+                stopBtn.setVisibility(View.VISIBLE);
+
+
+                //make it so the new route button is no longer clickable, because they are starting the routing process now
+                newRouteBtn.setClickable(false);
+                routesBtn.setClickable(false);
+
+                //calls custom function to start routing the route and tracking the users location and time
+                startRoute(v);
+            }
+        });
     }
 
 
@@ -288,13 +431,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    //this function is called when the user hits the clear button
-    public void onClear(View view) {
-
-        Log.d("ROUTE", "Clearing the map");
-
-        clearMap();
-    }
 
     //this function clears everything that has been drawn on the map so far
     public void clearMap() {
@@ -342,7 +478,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         activeSwitch.setChecked(true);
 
         //change the text associated with the active toggle
-        activeSwitch.setText("Active");
+        activeSwitch.setText(R.string.switch_active);
 
 
         //start the thread that pushes the timer and textview updates
@@ -376,174 +512,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
-    //this function responds to when the stop button is pressed
-    public void onStop(View view) {
-
-        //handle to the toggle
-        Switch activeSwitch = findViewById(R.id.activeSwitch);
-
-        //get a handle to the new route button
-        Button newRoute = findViewById(R.id.newRouteButton);
-
-        //handle to the regular routes button
-        Button routesButton = findViewById(R.id.routesButton);
-
-        //set the buttons to be clickable again
-        newRoute.setClickable(true);
-        routesButton.setClickable(true);
-
-        //update the text associated with the switch
-        activeSwitch.setText("Offline");
-        //change the state of the toggle
-        activeSwitch.setChecked(false);
-
-        //stop the thread that is keeping track of the elapsed time
-        //timerThread.interrupt();
-
-        //stop the timer
-        timerFunctionality.stop();
-
-        //reset the variable keeping track of user location for live drawing of their route
-        lastPoint = new LatLng(0, 0);
-
-
-        //reset the timer
-        timerFunctionality.setBase(SystemClock.elapsedRealtime());
-
-
-
-
-
-        //user just finished making a new route, handle this here
-        if(currentlyMakingARoute) {
-            currentlyMakingARoute = false;
-
-
-        }
-
-
-
-        Log.d("Route", "The user is not active");
-
-
-
-    }
-
-    //this function responds to when the Routes or New Route button has been clicked
-    public void onRoutes(View view) {
-
-        //tell logcat user is doing something with routes
-        Log.d("Route", "User has clicked a button associated with routes");
-        Log.d("Route", "view.getId() = " + view.getId());
-        Log.d("Route", "R.id.routesButton = " + R.id.routesButton);
-
-
-
-        //when the user hits the routes button
-        //bring up the users saved routes
-        if(view.getId() == R.id.routesButton) {
-
-            //start a new activity (a new screen on the app) that shows all of the available routes to select
-
-            //make a new intent
-            Intent intent = new Intent(this, displayAvailableRoutesActivity.class);
-            TextView activeRouteLabel = findViewById(R.id.activeRouteLabel);
-
-            //update the local variable holding the names of the routes
-            updateNamesArray();
-
-            //add the array of names of the routes to the new intent
-            intent.putExtra("arrayNames", routesNames);
-
-            //start the new window activity passing along the intent we just created
-            startActivity(intent);
-
-            /*
-            //START: testing only here want to see if the route is being saved properly
-            Log.d("ROUTE TEST", " Size of route array: " + routesInformation.size());
-
-            int size;
-            //for each route stored
-            for(int i = 0; i < routesInformation.size(); i++) {
-
-                size = routesInformation.get(i).getSize();
-
-                //for each point in the route stored
-                for(int x = 0; x < size; x++) {
-
-                    Log.d("ROUTE TEST", "Time: " + routesInformation.get(i).getPoint(x).getTime() + " Point: " + x + " Latitude: " + routesInformation.get(i).getPoint(x).getLocation().latitude + " Longitude: " + routesInformation.get(i).getPoint(x).getLocation().longitude);
-
-
-
-                }
-
-            }
-
-            //call draw routes on all the routes created
-            for(int z = 0; z < routesInformation.size(); z++) {
-
-                Log.d("ROUTE TEST", "Drawing a route");
-
-
-                drawRoute(routesInformation.get(z));
-            }
-
-
-            //END: testing only here want to see if the route is being saved properly
-
-             */
-
-        }
-
-        //when the user hits the new route button
-        //start the route making process
-        if (view.getId() == R.id.newRouteButton) {
-
-            //increment how route number the user is working on
-            routeNumber++;
-
-            routesInformation.add(new Route(routeNumber));
-            //tell logcat user is creating a route
-            Log.d("Route", "User has clicked new route");
-
-            //set the boolean keeping track of route making status to true
-            currentlyMakingARoute = true;
-
-            //handle to the active switch
-            Switch activeSwitch = findViewById(R.id.activeSwitch);
-
-            //get a handle to the new route button
-            Button newRoute = findViewById(R.id.newRouteButton);
-
-            //handle to the regular routes button
-            Button routesButton = findViewById(R.id.routesButton);
-
-            //handle to the stop button
-            Button stopButton = findViewById(R.id.stopButton);
-
-            //change the text of the toggle
-            activeSwitch.setText("Active");
-            //change the state of the toggle
-            activeSwitch.setChecked(true);
-
-            //when the user is creating a new route
-            stopButton.setVisibility(View.VISIBLE);
-
-
-            //make it so the new route button is no longer clickable, because they are starting the routing process now
-            newRoute.setClickable(false);
-            routesButton.setClickable(false);
-
-            //calls custom function to start routing the route and tracking the users location and time
-            startRoute(view);
-
-
-        }
-
-
-
-    }
 
     //this function responds to when the user hits the active toggle
     public void onToggle(View view) {
@@ -699,7 +667,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //if there was a result
                             if (roamingLocation != null) {
-                                Log.d("Route", "Roaming location updated");
+                                Log.d(ROUTE_TAG, "Roaming location updated");
 
                                 locationNow = new LatLng(roamingLocation.getLatitude(), roamingLocation.getLongitude());
                                 //if the user is currently making a route, add this information to the temporary store of the route points
@@ -717,7 +685,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                             } else {
-                                Log.d("Route", "Problem updating roaming location");
+                                Log.d(ROUTE_TAG, "Problem updating roaming location");
                             }
 
                         }

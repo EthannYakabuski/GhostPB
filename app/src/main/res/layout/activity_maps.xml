@@ -29,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
-            android:onClick="onRoutes"
             android:text="@string/route_Button" />
 
         <Button
@@ -39,7 +38,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
-            android:onClick="onRoutes"
             android:text="@string/new_route_button" />
 
         <Button
@@ -50,7 +48,6 @@
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="8dp"
-            android:onClick="onStop"
             android:text="@string/stop_button_good" />
 
         <Button
@@ -61,7 +58,6 @@
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="8dp"
-            android:onClick="onClear"
             android:text="@string/clear_map" />
 
 

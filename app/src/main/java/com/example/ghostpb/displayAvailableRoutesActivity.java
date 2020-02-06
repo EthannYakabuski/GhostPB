@@ -22,7 +22,7 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
 
         //user can store up to ten names
 
-        //routeArray routeNamesFormatted = new routeArray(10);
+        routeArray routeNamesFormatted = new routeArray(10);
         //String[] routeNamesFormatted = new String[10];
 
         //get a handle to the listview holding the names of the routes
