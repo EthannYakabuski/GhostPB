@@ -1,0 +1,7 @@
+Removed StopWatch as we are now going to use a custom chronometer instead
+
+Spent 1 hour discussing tasks that need to be done
+
+Spent 3 hours reading code and tutorials about the chronometer to properly implement one that displays the milliseconds.
+
+Spent 2 hours attempting to implement the chronometer
