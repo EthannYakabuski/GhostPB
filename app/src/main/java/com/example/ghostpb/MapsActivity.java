@@ -11,6 +11,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,7 +19,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -213,6 +216,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        // This will auto-size the map to always be half the height and full width of the phone's screen
+        /* Code Sources:
+        https://stackoverflow.com/questions/21469345/how-do-you-programmatically-change-the-width-height-of-google-maps-v2-support
+        http://www.androidtutorialshub.com/how-to-get-width-and-height-android-screen-in-pixels/
+         */
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        Log.e(ROUTE_TAG, "Device width of" + width);
+        Log.e(ROUTE_TAG, "Device height of" + height);
+        ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
+        params.height = height / 2;
+        params.width = width;
+        mapFragment.getView().setLayoutParams(params);
+
 
         // When the Stop button is pressed
         stopBtn.setOnClickListener(new View.OnClickListener() {
