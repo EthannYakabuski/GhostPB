@@ -1,0 +1,16 @@
+2 hours:
+  Group meeting. 
+  Learned how to use git together with github in Android Studio. 
+  Resolved merging conflicts.
+1 hour:
+  Converted the LinearLayout to ConstraintLayout.
+  Made the size of the map dynamic to the phone’s screen size.
+1 hour:
+  Investigated ListViews:
+    https://developer.android.com/reference/android/widget/ListView
+    https://developer.android.com/guide/topics/ui/declaring-layout.html
+  Looked into ways to store data, such as when the app is launched fresh after 
+  routes having been made in the past:
+    https://developer.android.com/training/data-storage
+  For the purpose of our app, I believe the better choice is to go for App-Specific Storage:
+    https://developer.android.com/training/data-storage/app-specific#java
