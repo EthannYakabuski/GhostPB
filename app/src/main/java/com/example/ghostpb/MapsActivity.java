@@ -97,10 +97,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Chronometer timerFunctionality;
     private boolean chronometerRunning;
 
-    //access to the chronometer driving the ghost animation
-    private Chronometer ghostFunctionality;
-    private boolean ghostRunning;
-
     //variables used to help draw the route live
     private LatLng lastPoint = new LatLng(0, 0);
 
@@ -111,6 +107,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //array of the drawn polylines on the map
     private ArrayList<Polyline> polyLines = new ArrayList<>();
+
+    //array of the drawn ghost circles on the map
+    private ArrayList<Circle> ghostCircles = new ArrayList<>();
 
     //array of 'simulated' routes, used for DEMO D2
     //simulated routes can be created by using this resource: https://getlatlong.net
@@ -134,6 +133,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
     public static final String ROUTE_TAG = "ROUTE";
     public static final String TEST_TAG = "ROUTE TEST";
+
+    public boolean racingAGhost;
+    public int ghostPointLocation;
 
 
     @Override
@@ -159,11 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
-
-        ghostFunctionality = findViewById(R.id.ghostChronometer);
-        ghostFunctionality.setBase(SystemClock.elapsedRealtime());
-
-
         //add the routes for DEMO D2
         populateDemoRoutes();
 
@@ -179,18 +176,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //call the custom function to update users location and store route information
                 updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
 
-            }
-        });
 
 
-        //the function that is called every second to update the ghost location on the map
-        ghostFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-
-                long elapsedMillis = SystemClock.elapsedRealtime() - ghostFunctionality.getBase();
-
-                updateGhostLocation(activeGhostRoute, elapsedMillis);
             }
         });
 
@@ -259,6 +246,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //reset the variable keeping track of user location for live drawing of their route
                 lastPoint = new LatLng(0, 0);
+
+                //reset the ghost ticker index
+                ghostPointLocation = 0;
 
                 //reset the timer
                 timerFunctionality.setBase(SystemClock.elapsedRealtime());
@@ -409,6 +399,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for(int i = 0; i < demoRoutes.size(); i++) {
             drawRoute(demoRoutes.get(i));
         }
+
     }
 
 
@@ -450,7 +441,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         demoRoutes.add(campusAveLoop);
 
+        activeGhostRoute = demoRoutes.get(0);
 
+        racingAGhost = true;
+
+        //showDemoRoutes();
+
+
+    }
+
+
+    public void clearGhosts() {
+
+        for(int i = 0; i < ghostCircles.size(); i++) {
+
+            ghostCircles.get(i).remove();
+
+        }
+
+        ghostCircles.clear();
     }
 
 
@@ -645,20 +654,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
     private void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
 
-        //search through currentRoute to find the RoutePoint associated with timeWhenHappenned
-        for(int i = 0; i < currentRoute.getSize(); i++) {
+        clearGhosts();
 
-            //this is the appropriate place to draw the ghost
+        Log.d("GHOST TEST", "timeWhenHappenned: "+ timeWhenHappenned);
+
+        for(int i = 0; i < currentRoute.getSize(); i++) {
+            Log.d("GHOST TEST", "currentRoute.getPoint(i).getTime(): "+ currentRoute.getPoint(i).getTime());
+
             if(currentRoute.getPoint(i).getTime() == timeWhenHappenned) {
 
-                //extract the location information from the appropriate route point
-                LatLng ghostLocation = new LatLng(currentRoute.getPoint(i).getLocation().latitude, currentRoute.getPoint(i).getLocation().longitude);
+                Log.d("GHOST TEST","Current Ghost location found");
 
-                //draw the circle using google maps api 'circle' function
+                //draw the ghost to the map
+                Circle ghostCircle = mMap.addCircle(new CircleOptions()
+                        .center(currentRoute.getPoint(i).getLocation())
+                        .radius(10)
+                        .strokeColor(Color.BLACK)
+                        .fillColor(Color.BLACK));
 
+                ghostCircles.add(ghostCircle);
 
             }
-
         }
 
 
@@ -697,6 +713,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 drawRouteLive(lastPoint, locationNow);
 
                                 lastPoint = locationNow;
+
+                                //if the user is currently racing a ghost, update the ghost location on the map
+                                if(racingAGhost) {
+                                    ghostPointLocation++;
+                                    Log.d("GHOST TEST", "Racing against a ghost");
+
+                                    updateGhostLocation(activeGhostRoute, ghostPointLocation);
+
+                                }
 
                                 if(makingARoute) {
 
