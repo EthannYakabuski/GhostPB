@@ -1,0 +1,7 @@
+February 10th - 16th
+
+1 hour
+Fixed a bug from merging branches
+
+2 hours
+Group meeting
