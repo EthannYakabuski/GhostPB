@@ -1,0 +1,3 @@
+2  hours : Reading up on functions in android studio
+
+4 hours : completion of millisecond counting chronometer
