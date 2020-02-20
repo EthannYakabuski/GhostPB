@@ -1,0 +1,14 @@
+February 17th - 23rd
+DONE:
+2 hours
+Created new branch for Demo D2 live
+Finished ghost animation
+
+1 hours
+Researched how to give an emulated phone location data through android studio
+Added user GPX location playback file
+
+
+TODO:
+3 hours
+Work on diagram for D2 PDF
