@@ -97,10 +97,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Chronometer timerFunctionality;
     private boolean chronometerRunning;
 
-    //access to the chronometer driving the ghost animation
-    private Chronometer ghostFunctionality;
-    private boolean ghostRunning;
-
     //variables used to help draw the route live
     private LatLng lastPoint = new LatLng(0, 0);
 
@@ -111,6 +107,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //array of the drawn polylines on the map
     private ArrayList<Polyline> polyLines = new ArrayList<>();
+
+    //array of the drawn ghost circles on the map
+    private ArrayList<Circle> ghostCircles = new ArrayList<>();
 
     //array of 'simulated' routes, used for DEMO D2
     //simulated routes can be created by using this resource: https://getlatlong.net
@@ -134,6 +133,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
     public static final String ROUTE_TAG = "ROUTE";
     public static final String TEST_TAG = "ROUTE TEST";
+
+    public boolean racingAGhost;
+    public int ghostPointLocation;
 
 
     @Override
@@ -159,11 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
-
-        ghostFunctionality = findViewById(R.id.ghostChronometer);
-        ghostFunctionality.setBase(SystemClock.elapsedRealtime());
-
-
         //add the routes for DEMO D2
         populateDemoRoutes();
 
@@ -179,18 +176,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //call the custom function to update users location and store route information
                 updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
 
-            }
-        });
 
 
-        //the function that is called every second to update the ghost location on the map
-        ghostFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-
-                long elapsedMillis = SystemClock.elapsedRealtime() - ghostFunctionality.getBase();
-
-                updateGhostLocation(activeGhostRoute, elapsedMillis);
             }
         });
 
@@ -259,6 +246,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //reset the variable keeping track of user location for live drawing of their route
                 lastPoint = new LatLng(0, 0);
+
+                //reset the ghost ticker index
+                ghostPointLocation = 0;
 
                 //reset the timer
                 timerFunctionality.setBase(SystemClock.elapsedRealtime());
@@ -409,17 +399,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for(int i = 0; i < demoRoutes.size(); i++) {
             drawRoute(demoRoutes.get(i));
         }
+
     }
 
 
     //this function populates the 'simulated' routes for use with DEMO D2
     //simulated routes can be created by using this resource: https://getlatlong.net
+
+    //TO PLAY SCENARIO 1 for DEMO D2
+    //see campusAveUserRoute.gpx in github 'folder gpx files'
+    //https://mapstogpx.com/ to create a gpx file from a google maps direction link
+
+    //TO PLAY GPX FILE:
+    //hit '...' on emulated phone options bar at the bottom
+    //hit location tab top right
+    //hit Load GPS/KML button on bottom left
+    //choose speed and hit play (comments below reflect that of a 1x speed playback)
     public void populateDemoRoutes() {
 
 
         Route campusAveLoop = new Route("Campus Ave Loop");
 
         //draws a line down Campus ave. Carleton University -- continue later
+
+        //user is ahead of the ghost
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385408, -75.696361), 1));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385378, -75.696359), 2));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385310,-75.696372), 3));
@@ -442,15 +445,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384174, -75.696351), 20));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384129,-75.696353 ), 21));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384080,-75.696345 ), 21));
+        //user has built a substantial lead on the ghost, but is not travelling slower
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383997,-75.696337 ), 22));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383941, -75.696340), 23));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383903, -75.696332), 24));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383835,-75.696329 ), 25));
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383782, -75.696311), 26));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383465,-75.696246), 27));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383391 ,-75.696226 ), 28));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383142 ,-75.696116 ), 29));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382970 ,-75.696037 ), 30));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382758 ,-75.695934 ), 31));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382713 ,-75.695900), 32));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382540 ,-75.695809 ), 33));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382395 ,-75.695694 ), 34));
+        //the ghost has quickly closed the distance
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382295 ,-75.695568 ), 35));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382244 ,-75.695436), 36));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382274 ,-75.695286 ), 37));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382317 ,-75.695138 ), 38));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382367 ,-75.694985 ), 39));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382433 ,-75.694854 ), 40));
+        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382483 ,-75.694694 ), 41));
+        //finish behind the ghost
+
 
         demoRoutes.add(campusAveLoop);
 
+        activeGhostRoute = demoRoutes.get(0);
 
+        racingAGhost = true;
+
+        //showDemoRoutes();
+
+
+    }
+
+
+    public void clearGhosts() {
+
+        for(int i = 0; i < ghostCircles.size(); i++) {
+
+            ghostCircles.get(i).remove();
+
+        }
+
+        ghostCircles.clear();
     }
 
 
@@ -467,6 +507,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //empty the array holding the drawn polylines
         polyLines.clear();
         //mMap.clear();
+
+        //if there is still a gost lingering on the map
+        if(ghostCircles.size() >= 1) {
+            clearGhosts();
+        }
     }
 
 
@@ -645,20 +690,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
     private void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
 
-        //search through currentRoute to find the RoutePoint associated with timeWhenHappenned
-        for(int i = 0; i < currentRoute.getSize(); i++) {
+        clearGhosts();
 
-            //this is the appropriate place to draw the ghost
+        Log.d("GHOST TEST", "timeWhenHappenned: "+ timeWhenHappenned);
+
+        for(int i = 0; i < currentRoute.getSize(); i++) {
+            Log.d("GHOST TEST", "currentRoute.getPoint(i).getTime(): "+ currentRoute.getPoint(i).getTime());
+
             if(currentRoute.getPoint(i).getTime() == timeWhenHappenned) {
 
-                //extract the location information from the appropriate route point
-                LatLng ghostLocation = new LatLng(currentRoute.getPoint(i).getLocation().latitude, currentRoute.getPoint(i).getLocation().longitude);
+                Log.d("GHOST TEST","Current Ghost location found");
 
-                //draw the circle using google maps api 'circle' function
+                //draw the ghost to the map
+                Circle ghostCircle = mMap.addCircle(new CircleOptions()
+                        .center(currentRoute.getPoint(i).getLocation())
+                        .radius(5)
+                        .strokeColor(Color.BLACK)
+                        .fillColor(Color.BLACK));
 
+                ghostCircles.add(ghostCircle);
 
             }
-
         }
 
 
@@ -697,6 +749,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 drawRouteLive(lastPoint, locationNow);
 
                                 lastPoint = locationNow;
+
+                                //if the user is currently racing a ghost, update the ghost location on the map
+                                if(racingAGhost) {
+                                    ghostPointLocation++;
+                                    Log.d("GHOST TEST", "Racing against a ghost");
+
+                                    updateGhostLocation(activeGhostRoute, ghostPointLocation);
+
+                                }
 
                                 if(makingARoute) {
 
