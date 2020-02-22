@@ -1,10 +1,13 @@
 package com.example.ghostpb;
 
+import com.google.android.gms.maps.model.Polyline;
+
 import java.util.ArrayList;
 
 public class Route {
 
     private ArrayList<RoutePoint> routePoints = new ArrayList<>();
+    private ArrayList<Polyline> routeLines = new ArrayList<>();
     private int routeID;
     private String routeName;
 
@@ -26,6 +29,10 @@ public class Route {
     //sets the backing arraylist to the given arraylist of RoutePoints
     public void setAllRoutePoints(ArrayList<RoutePoint> rp) {
         routePoints = rp;
+    }
+
+    public void addLine(Polyline line) {
+        routeLines.add(line);
     }
 
     Route(int id) {
