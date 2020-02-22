@@ -119,6 +119,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //variable for holding the route the ghost is currently navigating
     private Route activeGhostRoute;
 
+    //variable for holding the route that the user is currently navigating
+    private Route activeUserRoute;
+
+
 
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
@@ -160,6 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         timerFunctionality = findViewById(R.id.timerChronometer);
         timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
 
         //add the routes for DEMO D2
         populateDemoRoutes();
@@ -472,11 +477,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         demoRoutes.add(campusAveLoop);
 
-        activeGhostRoute = demoRoutes.get(0);
+        //activeGhostRoute = demoRoutes.get(0);
 
-        racingAGhost = true;
+        //racingAGhost = true;
 
         //showDemoRoutes();
+
 
 
     }
