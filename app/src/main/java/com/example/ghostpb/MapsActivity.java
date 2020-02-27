@@ -107,6 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //variable for holding the route the ghost is currently navigating
     private Route activeGhostRoute;
+    private int ghostCounter = 0;
 
     //variable for holding the route that the user is currently navigating
     private Route activeUserRoute;
@@ -121,6 +122,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button stopBtn;
     private Button routesBtn;
     private Button newRouteBtn;
+    private Button startRaceBtn;
+    private Button stopRaceBtn;
     private Switch activeSwitch;
 
     // textview for distance tracker
@@ -154,12 +157,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         stopBtn      = (Button) findViewById(R.id.stopButton);
         routesBtn    = (Button) findViewById(R.id.routesButton);
         newRouteBtn  = (Button) findViewById(R.id.newRouteButton);
+        startRaceBtn = (Button) findViewById(R.id.startRaceButton);
+        stopRaceBtn = (Button) findViewById(R.id.stopRaceButton);
         activeSwitch = (Switch) findViewById(R.id.activeSwitch);
 
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
 
+        //hide the buttons associated with ghost racing for now
+        startRaceBtn.setVisibility(View.INVISIBLE);
+        stopRaceBtn.setVisibility(View.INVISIBLE);
 
         ghostPrompts = (TextView) findViewById(R.id.ghostPrompts);
 
@@ -373,6 +381,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startRoute(v);
             }
         });
+
+        startRaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("LIST-TEST", "Race starting, begin animating ghost");
+
+                startRaceBtn.setVisibility(View.INVISIBLE);
+                stopRaceBtn.setVisibility(View.VISIBLE);
+
+                //set the racing a ghost variable to be true
+                racingAGhost = true;
+
+                //clear the map
+                clearMap();
+                //draw the active route
+                drawRoute(activeUserRoute);
+                //move the maps camera to the start (the first point) of the route
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(activeUserRoute.getPoint(0).getLocation(),DEFAULT_ZOOM));
+
+
+                timerFunctionality.setBase(SystemClock.elapsedRealtime());
+                timerFunctionality.start();
+
+            }
+        });
+
+        stopRaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("LIST-TEST", "Race starting, begin animating ghost");
+
+                stopRaceBtn.setVisibility(View.INVISIBLE);
+
+                //set the racing a ghost variable to be true
+                racingAGhost = false;
+
+                //stop the tiemr
+                timerFunctionality.stop();
+                timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
+                ghostCounter = 0;
+
+                //clear the map of any remnants from the run
+                clearMap();
+
+            }
+        });
     }
 
 
@@ -421,8 +476,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(requestCode == 004 && resultCode == RESULT_OK) {
             Log.d("LIST-TEST", "listposition: " + data.getStringExtra("listpositionclicked"));
 
-
-            setActiveRoute(data.getStringExtra("listpositionclicked"));
+            //if there is at least one list that has been created, and the user has clicked one and set it as active
+            if(!(-1 == Integer.parseInt(data.getStringExtra("listpositionclicked")))) {
+                setActiveRoute(data.getStringExtra("listpositionclicked"));
+            }
 
 
         }
@@ -447,6 +504,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //set the users active route to the one that was clicked in the second activity
         activeUserRoute = routesInformation.get(positionOfRouteInt);
+        activeGhostRoute = routesInformation.get(positionOfRouteInt);
+
+        //draws the selected route to the screen
+        drawRoute(activeUserRoute);
+
+        //show the START RACE button
+        startRaceBtn.setVisibility(View.VISIBLE);
 
     }
 
@@ -569,16 +633,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this custom function draws the route live while the user is making it
     public void drawRouteLive(LatLng previous, LatLng current) {
 
+        //route should not be drawn if the user is racing against a ghost
+        if (!racingAGhost) {
+            //if there is actual information in the last point
+            if (!(previous.longitude == 0)) {
+                //draws the poly line on the map between the previous point and the current point
+                Polyline line = mMap.addPolyline(new PolylineOptions()
+                        .add(previous, current)
+                        .width(5)
+                        .color(Color.BLUE));
 
-        //if there is actual information in the last point
-        if (!(previous.longitude == 0)) {
-            //draws the poly line on the map between the previous point and the current point
-            Polyline line = mMap.addPolyline(new PolylineOptions()
-                    .add(previous, current)
-                    .width(5)
-                    .color(Color.BLUE));
-
-            polyLines.add(line);
+                polyLines.add(line);
+            }
         }
     }
     //this function will start requesting the users location every second and saving
@@ -738,32 +804,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
-    private void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
+    private void updateGhostLocation(Route currentRoute, long timeWhenHappenned, int counter) {
+
+        //keep the map clean from previous runs
+        if(counter == 1) {
+            clearMap();
+            drawRoute(activeGhostRoute);
+        }
+
+        ghostCounter++;
 
         clearGhosts();
 
-        Log.d("GHOST TEST", "timeWhenHappenned: "+ timeWhenHappenned);
 
-        for(int i = 0; i < currentRoute.getSize(); i++) {
-            Log.d("GHOST TEST", "currentRoute.getPoint(i).getTime(): "+ currentRoute.getPoint(i).getTime());
+        Log.d("GHOST TEST","Current Ghost location found");
 
-            if(currentRoute.getPoint(i).getTime() == timeWhenHappenned) {
-
-                Log.d("GHOST TEST","Current Ghost location found");
-
-                //draw the ghost to the map
-                Circle ghostCircle = mMap.addCircle(new CircleOptions()
-                        .center(currentRoute.getPoint(i).getLocation())
-                        .radius(5)
-                        .strokeColor(Color.BLACK)
-                        .fillColor(Color.BLACK));
-
-                ghostCircles.add(ghostCircle);
-
-            }
+        //if the user is taking longer than the ghost, have the ghost wait at the finish line for them
+        if(counter >= activeGhostRoute.getSize()) {
+            counter = activeGhostRoute.getSize() -1;
         }
 
+        //draw the ghost to the map
+        Circle ghostCircle = mMap.addCircle(new CircleOptions()
+                .center(activeGhostRoute.getPoint(counter).getLocation())
+                .radius(7)
+                .strokeColor(Color.BLACK)
+                .fillColor(Color.BLACK));
 
+
+        ghostCircles.add(ghostCircle);
 
     }
 
@@ -806,7 +875,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     ghostPointLocation++;
                                     Log.d("GHOST TEST", "Racing against a ghost");
 
-                                    updateGhostLocation(activeGhostRoute, ghostPointLocation);
+                                    updateGhostLocation(activeGhostRoute, ghostPointLocation, ghostCounter);
 
                                 }
 

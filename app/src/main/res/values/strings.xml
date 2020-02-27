@@ -11,4 +11,6 @@
     <string name="clear_map">Clear</string>
     <string name="switch_active">Active</string>
     <string name="switch_offline">Offline</string>
+    <string name="start_race_button">Start Race</string>
+    <string name="stop_race_button">Stop Race</string>
 </resources>

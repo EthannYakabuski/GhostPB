@@ -126,6 +126,31 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@+id/timerChronometer" />
 
+    <Button
+        android:id="@+id/startRaceButton"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/start_race_button"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/distanceCounter"
+        />
+
+    <Button
+        android:id="@+id/stopRaceButton"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/stop_race_button"
+        map:layout_constraintStart_toEndOf="@+id/startRaceButton"
+        map:layout_constraintTop_toBottomOf="@+id/distanceCounter" />
+
     <TextView
         android:id="@+id/ghostPrompts"
         android:layout_width="wrap_content"
@@ -133,7 +158,9 @@
         android:layout_marginTop="36dp"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toBottomOf="@+id/distanceCounter" />
+        map:layout_constraintTop_toBottomOf="@+id/startRaceButton" />
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
