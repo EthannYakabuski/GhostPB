@@ -11,4 +11,16 @@
     <string name="clear_map">Clear</string>
     <string name="switch_active">Active</string>
     <string name="switch_offline">Offline</string>
+    <string name="back_button">Back</string>
+    <string name="rename_button">Rename</string>
+    <string name="select_button">Select</string>
+    <string name="delete_button">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter">Enter</string>
+    <string name="dialog_name_title">Name Route</string>
+    <string name="dialog_rename_title">Rename Route</string>
+    <string name="invalid_edit_text_toast">Invalid Name</string>
+    <string name="dialog_delete_title">Delete Route</string>
+    <string name="delete_success_toast">Route Deleted</string>
+    <string name="confirm">Confirm</string>
 </resources>
