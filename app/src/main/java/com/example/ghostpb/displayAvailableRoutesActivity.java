@@ -1,7 +1,5 @@
 package com.example.ghostpb;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,10 +8,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.lang.reflect.Array;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.ArrayList;
 
+
 public class displayAvailableRoutesActivity extends AppCompatActivity {
+
+    //variable to keep track of the list position that was clicked on this page
+    private int positionClicked = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +69,31 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //create an intent holding the route name clicked to send back to the parent activity
+                Log.d("LIST-TEST", "position of list item clicked: "+ position);
+                positionClicked = position;
 
             }
         });
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+        Intent intentBack = new Intent();
+
+        intentBack.putExtra("listpositionclicked", Integer.toString(positionClicked));
+
+        setResult(RESULT_OK,intentBack);
+
+        finish();
+    }
+
+
+
+
+
+
 
 
 

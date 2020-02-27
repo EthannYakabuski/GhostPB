@@ -19,6 +19,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -126,6 +127,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView distanceCounter;
 
 
+    //textview for the ghost prompts
+    private TextView ghostPrompts;
+
+
     public static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
     public static final String ROUTE_TAG = "ROUTE";
     public static final String TEST_TAG = "ROUTE TEST";
@@ -154,6 +159,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
+
+
+        ghostPrompts = (TextView) findViewById(R.id.ghostPrompts);
 
 
 
@@ -297,7 +305,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 intent.putExtra("arrayNames", routesNames);
 
                 //start the new window activity passing along the intent we just created
-                startActivity(intent);
+                startActivityForResult(intent, 004);
 
                 /*
                 //START: testing only here want to see if the route is being saved properly
@@ -404,11 +412,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        //a list item (a route entry on the displayed list) from the second activity has been clicked
+        if(requestCode == 004 && resultCode == RESULT_OK) {
+            Log.d("LIST-TEST", "listposition: " + data.getStringExtra("listpositionclicked"));
+
+
+            setActiveRoute(data.getStringExtra("listpositionclicked"));
+
+
+        }
+
+    }
+
     public void showDemoRoutes() {
 
         for(int i = 0; i < demoRoutes.size(); i++) {
             drawRoute(demoRoutes.get(i));
         }
+
+    }
+
+    public void setActiveRoute(String positionOfRoute) {
+
+        Log.d("LIST-TEST", "setting active route using the string data sent back from the child activity");
+
+        int positionOfRouteInt = Integer.parseInt(positionOfRoute);
+
+        Log.d("LIST-TEST", "positionOfRouteInt back in the parent activity: " + positionOfRouteInt);
+
+        //set the users active route to the one that was clicked in the second activity
+        activeUserRoute = routesInformation.get(positionOfRouteInt);
 
     }
 
