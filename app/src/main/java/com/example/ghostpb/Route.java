@@ -1,6 +1,5 @@
 package com.example.ghostpb;
 
-import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
