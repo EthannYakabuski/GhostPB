@@ -1,0 +1,12 @@
+7 hours:
+  Minor touches in visual design.
+	Implemented intents being passed between MapsActivity and displayAvailableRoutesActivity. Had to rework code in    	
+  both activities	and learn about Parcelables.
+	In displayAvailableRoutesActivity:
+		- Buttons for route selection, deletion, renaming, and going back. Decided to make these buttons 
+      for more explicit functionality. Did consider swipe operations, but that functionality may could go unnoticed 
+		- Each button has click event listeners, and their affect on content is also shown in the intent 
+		- Adjusted ListView attributes and constraints
+		- Added an event listener for the ConstraintLayout to help determine when an item in the listview is deselected 
+		- Dialog pop ups for delete and rename click events 
+		- Other minor touches

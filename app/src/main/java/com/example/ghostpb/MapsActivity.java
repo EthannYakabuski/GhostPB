@@ -1,7 +1,5 @@
 package com.example.ghostpb;
 
-
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,15 +8,13 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.text.InputFilter;
 import android.util.Log;
@@ -29,15 +25,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
-import android.widget.Filter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -48,20 +46,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.location.FusedLocationProviderClient;
 
-import java.sql.Array;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
+import com.google.maps.android.SphericalUtil;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TimeZone;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -143,13 +135,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
     private static final String ROUTE_TAG = "ROUTE";
     private static final String TEST_TAG = "ROUTE TEST";
-    private static final String DISPLAY_ROUTES = "display_routes";
     private static final int DISPLAY_ROUTES_CODE = 0;
     private static final String ROUTE_ID = "routeID";
     private static final String ROUTES_INFO = "routesInfo";
 
+    // textview for distance tracker
+    private TextView distanceCounter;
+
     public boolean racingAGhost;
     public int ghostPointLocation;
+
+    public double totalDistance;
 
 
     @Override
@@ -165,6 +161,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         routesBtn    = (Button) findViewById(R.id.routesButton);
         newRouteBtn  = (Button) findViewById(R.id.newRouteButton);
         activeSwitch = (Switch) findViewById(R.id.activeSwitch);
+
+        // set distanceCounter to invisible by default
+        distanceCounter = (TextView) findViewById(R.id.distanceCounter);
+        distanceCounter.setVisibility(View.INVISIBLE);
 
         //construct the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -324,6 +324,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dialog.show();
                 }
 
+                distanceCounter.setVisibility(View.INVISIBLE);
+
                 Log.d(ROUTE_TAG, "The user is not active");
             }
         });
@@ -414,6 +416,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 newRouteBtn.setClickable(false);
                 routesBtn.setClickable(false);
 
+                // set distanceCounter to visible while making new route
+                distanceCounter.setVisibility(View.VISIBLE);
+
                 //calls custom function to start routing the route and tracking the users location and time
                 startRoute(v);
             }
@@ -427,7 +432,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (requestCode == DISPLAY_ROUTES_CODE){
             if (intent == null) return;
 
-            int selectedID = intent.getIntExtra(ROUTE_ID, -1);
+            selectedID = intent.getIntExtra(ROUTE_ID, -1);
             routesInformation = (ArrayList<Route>) intent.getSerializableExtra(ROUTES_INFO);
 
             if (routesInformation == null){
@@ -503,7 +508,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //choose speed and hit play (comments below reflect that of a 1x speed playback)
     public void populateDemoRoutes() {
 
-
         Route campusAveLoop = new Route("Campus Ave Loop");
 
         //draws a line down Campus ave. Carleton University -- continue later
@@ -555,7 +559,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382483 ,-75.694694 ), 41));
         //finish behind the ghost
 
-
         demoRoutes.add(campusAveLoop);
 
         //activeGhostRoute = demoRoutes.get(0);
@@ -563,8 +566,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //racingAGhost = true;
 
         //showDemoRoutes();
-
-
 
     }
 
@@ -607,7 +608,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this custom function draws the route live while the user is making it
     public void drawRouteLive(LatLng previous, LatLng current) {
 
-
         //if there is actual information in the last point
         if (!(previous.longitude == 0)) {
             //draws the poly line on the map between the previous point and the current point
@@ -634,19 +634,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //change the text associated with the active toggle
         activeSwitch.setText(R.string.switch_active);
 
-
         //start the thread that pushes the timer and textview updates
         //timerThread.start();
-
 
         //start the timer
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
         timerFunctionality.start();
 
-
-
         currentlyMakingARoute = true;
-
 
     }
 
@@ -660,11 +655,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void requestLocationPermissions() {
 
         //if location permissions are already granted
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             boolLocationPermissionGranted = true;
 
         } else { //else ask the user for permission
-            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
 
         }
 
@@ -708,10 +703,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //adds the button that jumps to your current location
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-
-
-
-
             //location permission is not on yet, so ask the user for these permissions
             } else {
                 mMap.setMyLocationEnabled(false);
@@ -743,7 +734,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .width(5)
                     .color(Color.RED));
              */
-
 
             Polyline line = mMap.addPolyline(new PolylineOptions()
                     .add(route.getPoint(i-1).getLocation(), route.getPoint(i).getLocation())
@@ -787,8 +777,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //this function updates the device location and saves the point to the associated route
     //updates the roamingLocation global variable
-    //
-
     private void updateDeviceLocation(final boolean makingARoute, final long timeWhenHappenned, final int routeNum) {
 
         try {
@@ -815,6 +803,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 drawRouteLive(lastPoint, locationNow);
 
+
                                 lastPoint = locationNow;
 
                                 //if the user is currently racing a ghost, update the ghost location on the map
@@ -830,6 +819,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     //make a new route point and add it to the temporary structure
                                     routesInformation.get(routeNumber).addPoint(new RoutePoint(locationNow, timeWhenHappenned));
+                                    // calculate the total distance of the route to this point
+                                    totalDistance = calculateDistance(routesInformation.get(routeNumber));
+                                    String distanceText = String.format("Total Distance: %f Meters", totalDistance);
+                                    distanceCounter.setText(distanceText);
 
                                 }
 
@@ -839,7 +832,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
 
                         }
-
 
                     }
 
@@ -858,7 +850,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showDeviceLocation() {
-
 
         try {
             if(boolLocationPermissionGranted) {
@@ -894,7 +885,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
 
                         }
-
+                  
                 });
 
             }
@@ -908,6 +899,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
+    // Returns the routes total distance in meters
+    private double calculateDistance(Route route) {
+        double totalDistance = 0;
+        for(int i=0; i<route.getSize()-1; i++) {
+            LatLng p1 = route.getPoint(i).getLocation();
+            LatLng p2 = route.getPoint(i+1).getLocation();
+            totalDistance += SphericalUtil.computeDistanceBetween(p1, p2);
+        }
+        return totalDistance;
+    }
 }
 
 

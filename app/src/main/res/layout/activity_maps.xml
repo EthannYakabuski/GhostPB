@@ -117,5 +117,15 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@+id/activeSwitch" />
 
+    <TextView
+        android:id="@+id/distanceCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="TextView"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/timerChronometer" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
