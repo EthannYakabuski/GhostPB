@@ -1,0 +1,9 @@
+2 hours:
+	Group meeting
+30 min:
+	Making the intent able to transfer ArrayList of RoutePoints
+1.5 hours:
+	Commenting
+	Cleaned up some code
+	Being able to name a new route when stopping a new route implemented
+	Resolved merge conflicts
