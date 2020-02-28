@@ -16,7 +16,6 @@ import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.text.InputFilter;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -29,11 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
