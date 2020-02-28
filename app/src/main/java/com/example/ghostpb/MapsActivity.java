@@ -1,6 +1,13 @@
 package com.example.ghostpb;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,14 +16,19 @@ import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -39,10 +51,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-
 import com.google.maps.android.SphericalUtil;
-
-
 
 import java.util.ArrayList;
 
@@ -81,6 +90,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //true when user is currently making a new route
     private boolean currentlyMakingARoute;
 
+    private Route selectedRoute = null;
+
+    private int selectedID = -1;
+
     //access to the chronometer
     private Chronometer timerFunctionality;
     private boolean chronometerRunning;
@@ -103,14 +116,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //simulated routes can be created by using this resource: https://getlatlong.net
     private ArrayList<Route> demoRoutes = new ArrayList<>();
 
-
     //variable for holding the route the ghost is currently navigating
     private Route activeGhostRoute;
 
     //variable for holding the route that the user is currently navigating
     private Route activeUserRoute;
-
-
 
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
@@ -122,13 +132,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button newRouteBtn;
     private Switch activeSwitch;
 
+    private static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
+    private static final String ROUTE_TAG = "ROUTE";
+    private static final String TEST_TAG = "ROUTE TEST";
+    private static final int DISPLAY_ROUTES_CODE = 0;
+    private static final String ROUTE_ID = "routeID";
+    private static final String ROUTES_INFO = "routesInfo";
+
     // textview for distance tracker
     private TextView distanceCounter;
-
-
-    public static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
-    public static final String ROUTE_TAG = "ROUTE";
-    public static final String TEST_TAG = "ROUTE TEST";
 
     public boolean racingAGhost;
     public int ghostPointLocation;
@@ -139,7 +151,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         //retrieve content view that renders the map
         setContentView(R.layout.activity_maps);
@@ -154,8 +165,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
-
-
 
         //construct the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -175,13 +184,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onChronometerTick(Chronometer chronometer) {
 
-
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
                 //call the custom function to update users location and store route information
                 updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
-
-
 
             }
         });
@@ -198,8 +204,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(locationResult == null) {
                     return;
                 }
-
-
             }
         };
 
@@ -220,8 +224,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        Log.e(ROUTE_TAG, "Device width of" + width);
-        Log.e(ROUTE_TAG, "Device height of" + height);
+        Log.e(ROUTE_TAG, "Device width of " + width);
+        Log.e(ROUTE_TAG, "Device height of " + height);
         ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
         params.height = height / 2;
         params.width = width;
@@ -240,6 +244,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //update the text associated with the switch
                 activeSwitch.setText(R.string.switch_offline);
+
                 //change the state of the toggle
                 activeSwitch.setChecked(false);
 
@@ -261,6 +266,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //user just finished making a new route, handle this here
                 if(currentlyMakingARoute) {
                     currentlyMakingARoute = false;
+
+                    // get input for the name of the route
+
+                    // This is a popup box that will take input
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+
+                    //create the EditText that will take the typed input
+                    final EditText input = new EditText(MapsActivity.this);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.MATCH_PARENT);
+                    input.setLayoutParams(lp);
+
+                    // Chain together various setter methods to set the dialog characteristics
+                    builder.setMessage("Enter the name for this route:")
+                            .setTitle(R.string.dialog_name_title);
+
+                    // Add the buttons
+                    builder.setPositiveButton(R.string.enter, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User clicked Enter button - Rename the route from the EditText if not empty, etc.
+                            String newName = input.getText().toString().trim();
+                            if (!newName.isEmpty()) {
+                                // Set route name
+                                routesInformation.get(routeNumber).setName(newName);
+
+                                // A toast will pop up showing success
+                                Toast toast = Toast.makeText(MapsActivity.this, newName + " saved", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+                                toast.show();
+                            }
+                            else{
+                                routesInformation.get(routeNumber).setName("Unnamed Route");
+
+                                // A toast pop up for invalid input. Will put route name to default
+                                Toast toast = Toast.makeText(MapsActivity.this, "Unnamed Route saved", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+                                toast.show();
+                            }
+
+                        }
+                    });
+                    builder.setNegativeButton(R.string.dialog_delete_title, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog - do not save the route
+                            Toast toast = Toast.makeText(MapsActivity.this, "Route not saved", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+                            toast.show();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+
+                    // Add the EditText to the dialog
+                    dialog.setView(input);
+
+                    dialog.show();
                 }
 
                 distanceCounter.setVisibility(View.INVISIBLE);
@@ -290,14 +351,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Intent intent = new Intent(MapsActivity.this, displayAvailableRoutesActivity.class);
                 TextView activeRouteLabel = findViewById(R.id.activeRouteLabel);
 
-                //update the local variable holding the names of the routes
-                updateNamesArray();
-
                 //add the array of names of the routes to the new intent
-                intent.putExtra("arrayNames", routesNames);
+                intent.putParcelableArrayListExtra(ROUTES_INFO, routesInformation);
 
                 //start the new window activity passing along the intent we just created
-                startActivity(intent);
+                startActivityForResult(intent, DISPLAY_ROUTES_CODE);
 
                 /*
                 //START: testing only here want to see if the route is being saved properly
@@ -326,7 +384,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 //END: testing only here want to see if the route is being saved properly
-
                  */
             }
         });
@@ -338,15 +395,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d(ROUTE_TAG, "New Routes button clicked");
 
                 //increment how route number the user is working on
-                routeNumber++;
+                routeNumber = routesInformation.size();
 
-                routesInformation.add(new Route(routeNumber));
+                routesInformation.add(new Route (routeNumber));
 
                 //set the boolean keeping track of route making status to true
                 currentlyMakingARoute = true;
 
                 //change the text of the toggle
                 activeSwitch.setText(R.string.switch_active);
+
                 //change the state of the toggle
                 activeSwitch.setChecked(true);
 
@@ -365,6 +423,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startRoute(v);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        if (resultCode != Activity.RESULT_OK)return;
+
+        if (requestCode == DISPLAY_ROUTES_CODE){
+            if (intent == null) return;
+
+            selectedID = intent.getIntExtra(ROUTE_ID, -1);
+            routesInformation = (ArrayList<Route>) intent.getSerializableExtra(ROUTES_INFO);
+
+            if (routesInformation == null){
+                routesInformation = new ArrayList<>();
+            }
+            routeNumber = routesInformation.size();
+
+            Log.d(ROUTE_TAG, "Got selected id: " + selectedID);
+            Log.d(ROUTE_TAG, "Routes: " + routesNames);
+            Log.d(ROUTE_TAG, "Routes Info: " + routesInformation);
+
+            if (selectedID < 0) return;
+
+            selectedRoute = routesInformation.get(selectedID);
+            drawRoute(selectedRoute);
+        }
     }
 
 
@@ -392,11 +476,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //turn on myLocation control button on the map (top right set my location button)
         updateLocationUI();
 
-
-
         //finds the phone and sets the map to go to users current location
         showDeviceLocation();
-
 
         //show demo route
         //showDemoRoutes();
@@ -426,7 +507,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //hit Load GPS/KML button on bottom left
     //choose speed and hit play (comments below reflect that of a 1x speed playback)
     public void populateDemoRoutes() {
-
 
         Route campusAveLoop = new Route("Campus Ave Loop");
 
@@ -479,7 +559,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382483 ,-75.694694 ), 41));
         //finish behind the ghost
 
-
         demoRoutes.add(campusAveLoop);
 
         //activeGhostRoute = demoRoutes.get(0);
@@ -487,8 +566,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //racingAGhost = true;
 
         //showDemoRoutes();
-
-
 
     }
 
@@ -531,7 +608,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this custom function draws the route live while the user is making it
     public void drawRouteLive(LatLng previous, LatLng current) {
 
-
         //if there is actual information in the last point
         if (!(previous.longitude == 0)) {
             //draws the poly line on the map between the previous point and the current point
@@ -558,43 +634,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //change the text associated with the active toggle
         activeSwitch.setText(R.string.switch_active);
 
-
         //start the thread that pushes the timer and textview updates
         //timerThread.start();
-
 
         //start the timer
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
         timerFunctionality.start();
 
-
-
-
         currentlyMakingARoute = true;
 
-
     }
-
-    //updates the array holding the route names in order to send this information along with the intent to make a new
-    //activity when the routes button is clicked
-    public void updateNamesArray() {
-
-        //first clear the array holding the name information from any previous clicks of routes button
-        routesNames.clear();
-
-        //for each route that is stored save that name information in the routeNames array
-        for(int i = 0; i < routesInformation.size(); i++) {
-
-            routesNames.add(routesInformation.get(i).getName());
-
-
-        }
-    }
-
 
     //this function responds to when the user hits the active toggle
     public void onToggle(View view) {
-
 
     }
 
@@ -631,7 +683,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //update the UI based on permissions
         updateLocationUI();
 
-
     }
 
 
@@ -651,10 +702,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //adds the button that jumps to your current location
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
-
-
-
 
             //location permission is not on yet, so ask the user for these permissions
             } else {
@@ -677,6 +724,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void drawRoute(Route route) {
 
+        Log.d(ROUTE_TAG, "Drawing route: " + selectedRoute.getName());
+
         for(int i = 1; i < route.getSize(); i++) {
 
             /**
@@ -686,7 +735,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .color(Color.RED));
              */
 
-
             Polyline line = mMap.addPolyline(new PolylineOptions()
                     .add(route.getPoint(i-1).getLocation(), route.getPoint(i).getLocation())
                     .width(5)
@@ -694,7 +742,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             polyLines.add(line);
         }
-
 
     }
 
@@ -725,15 +772,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-
-
     }
 
 
     //this function updates the device location and saves the point to the associated route
     //updates the roamingLocation global variable
-    //
-
     private void updateDeviceLocation(final boolean makingARoute, final long timeWhenHappenned, final int routeNum) {
 
         try {
@@ -790,7 +833,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
 
-
                     }
 
                 });
@@ -805,12 +847,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-
-
     }
 
     private void showDeviceLocation() {
-
 
         try {
             if(boolLocationPermissionGranted) {
@@ -846,9 +885,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
 
                         }
-
+                  
                 });
-
 
             }
 
@@ -858,7 +896,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.e("Exception: %s", e.getMessage());
             }
         }
-
 
     }
 
@@ -874,3 +911,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return totalDistance;
     }
 }
+
+

@@ -1,5 +1,8 @@
 package com.example.ghostpb;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.sql.Time;
@@ -8,7 +11,7 @@ import java.sql.Time;
 //class for holding a LatLng object and a Time object,
 //over the course of making a route the user will generate many of these,
 //the information will be later used to draw the route using polylines functionality
-public class RoutePoint {
+public class RoutePoint implements Parcelable {
 
     //holds the latitude and longitude of the user when this route point was created
     private LatLng location;
@@ -35,5 +38,30 @@ public class RoutePoint {
         timeAtLocation = time;
 
     }
+
+    // Parcels are for being able to pass the Object through the intents
+    RoutePoint(Parcel in){
+        location = (LatLng) in.readValue(LatLng.class.getClassLoader());
+        timeAtLocation = in.readLong();
+    }
+
+    @Override
+    public int describeContents() {
+        return this.hashCode();
+    }
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(location);
+        dest.writeLong(timeAtLocation);
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public RoutePoint createFromParcel(Parcel in) {
+            return new RoutePoint(in);
+        }
+
+        public RoutePoint[] newArray(int size) {
+            return new RoutePoint[size];
+        }
+    };
 
 }
