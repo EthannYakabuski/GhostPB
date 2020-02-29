@@ -2,6 +2,7 @@ package com.example.ghostpb;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -28,6 +29,23 @@ public class RoutePoint implements Parcelable {
     public long getTime() {
 
         return timeAtLocation;
+
+    }
+
+
+    //returns this route point in a string
+    @Override
+    public String toString() {
+
+        String returnString = "";
+
+        returnString = returnString + Double.toString(location.latitude);
+        returnString = returnString + ",";
+        returnString = returnString + Double.toString(location.longitude);
+
+        Log.d("FILE-TEST", "to string route point: " + returnString);
+
+        return returnString;
 
     }
 

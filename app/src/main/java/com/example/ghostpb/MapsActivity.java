@@ -47,6 +47,12 @@ import com.google.android.gms.tasks.Task;
 
 import com.google.maps.android.SphericalUtil;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -151,6 +157,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //retrieve content view that renders the map
         setContentView(R.layout.activity_maps);
+
+        //load the saved contents from the file
+        readFile();
 
         // Widgets for the click event listeners
         clearBtn     = (Button) findViewById(R.id.clearMapButton);
@@ -299,6 +308,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Toast toast = Toast.makeText(MapsActivity.this, newName + " saved", Toast.LENGTH_SHORT);
                                 toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
                                 toast.show();
+
+                                //when a new route is created remake the saved route file
+                                writeFile();
                             }
                             else{
                                 routesInformation.get(routeNumber).setName("Unnamed Route");
@@ -317,6 +329,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Toast toast = Toast.makeText(MapsActivity.this, "Route not saved", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
                             toast.show();
+
                         }
                     });
                     AlertDialog dialog = builder.create();
@@ -514,6 +527,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             routeNumber = routesInformation.size();
 
+            //write the new array after user changes to the saved file
+            writeFile();
+
             Log.d(ROUTE_TAG, "Got selected id: " + selectedID);
             Log.d(ROUTE_TAG, "Routes: " + routesNames);
             Log.d(ROUTE_TAG, "Routes Info: " + routesInformation);
@@ -526,6 +542,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedRoute.getPoint(0).getLocation(),DEFAULT_ZOOM));
             //show the button to start the race against the ghost on the selected route
             showGhostRaceButton();
+
 
         }
     }
@@ -999,6 +1016,91 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return totalDistance;
     }
+
+
+    //this function will read from the saved file containing the routes information and re-populate
+    //the global routes array based on the information stored in the text file when the app reboots
+    //this simulates persistent storage for user
+    private void readFile() {
+
+        try {
+            //setting up things needed to read from the file
+            FileInputStream fis = openFileInput("routes.txt");
+            InputStreamReader isr = new InputStreamReader(fis);
+
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer sb = new StringBuffer();
+
+            String lines;
+
+            //while there is still content in the file to read
+            while((lines = br.readLine()) != null) {
+                sb.append(lines);
+            }
+
+            //tested to show the correct file when the user exits the apps and then reloads
+            Log.d("FILE-TEST", "String buffer contains: " + sb.toString());
+
+
+            //add code here to parse sb.toString() and re-populate the global routes array
+
+
+
+        } catch (FileNotFoundException e) {
+            //catches openFileInput
+            e.printStackTrace();
+            Log.d("FILE-TEST", "No file written yet");
+        } catch (IOException e) {
+            //catches br.readLine()
+            e.printStackTrace();
+            Log.d("FILE-TEST", "Error with reader input");
+        }
+
+
+
+    }
+
+
+    //this function will request all routes to toString themselves
+    //it will then write each route to a new file which replace the old one stored
+    private void writeFile() {
+
+        String saveData = "";
+
+        //add the amount of routes to the start
+        saveData = saveData + routesInformation.size();
+        saveData = saveData + "//";
+
+        //for each route
+        for(int i = 0; i < routesInformation.size(); i++) {
+            //toString the route and add to saved data
+            saveData = saveData + routesInformation.get(i).toString();
+        }
+
+        Log.d("FILE-TEST", "Saved data: " + saveData);
+
+
+        //attempt to write the saveData to the saved file
+        try {
+            FileOutputStream fos = openFileOutput("routes.txt", MODE_PRIVATE);
+            fos.write(saveData.getBytes());
+            fos.close();
+
+            Log.d("FILE-TEST", "route data save");
+
+        } catch (FileNotFoundException e) {
+            //catches openFileOutput
+            Log.d("FILE-TEST", "route data save issue");
+            e.printStackTrace();
+        } catch (IOException e) {
+            //catches fos.write
+            Log.d("FILE-TEST", "route data save issue");
+            e.printStackTrace();
+        }
+
+
+    }
+
 }
 
 
