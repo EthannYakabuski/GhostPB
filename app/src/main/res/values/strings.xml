@@ -23,4 +23,6 @@
     <string name="dialog_delete_title">Delete Route</string>
     <string name="delete_success_toast">Route Deleted</string>
     <string name="confirm">Confirm</string>
+    <string name="start_race_button">Start Race</string>
+    <string name="stop_race_button">Stop Race</string>
 </resources>
