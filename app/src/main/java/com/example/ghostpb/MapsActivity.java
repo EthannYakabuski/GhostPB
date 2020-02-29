@@ -124,6 +124,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button stopBtn;
     private Button routesBtn;
     private Button newRouteBtn;
+    private Button startRaceBtn;
+    private Button stopRaceBtn;
     private Switch activeSwitch;
 
     private static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
@@ -138,6 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public boolean racingAGhost;
     public int ghostPointLocation;
+    public int ghostCounter = -1;
 
     public double totalDistance;
 
@@ -154,11 +157,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         stopBtn      = (Button) findViewById(R.id.stopButton);
         routesBtn    = (Button) findViewById(R.id.routesButton);
         newRouteBtn  = (Button) findViewById(R.id.newRouteButton);
+        startRaceBtn = (Button) findViewById(R.id.startRaceButton);
+        stopRaceBtn  = (Button) findViewById(R.id.stopRaceButton);
         activeSwitch = (Switch) findViewById(R.id.activeSwitch);
 
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
+
+        // buttons associated with racing the ghost are invisible until the user has selected a route
+        startRaceBtn.setVisibility(View.INVISIBLE);
+        stopRaceBtn.setVisibility(View.INVISIBLE);
 
         //construct the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -382,6 +391,74 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+        // When the start race button is clicked (button is only available when the user has selected a route
+        startRaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d("GHOST-TEST", "Starting race against the ghost");
+
+                //make all of the other UI buttons not-clickable
+                routesBtn.setClickable(false);
+                newRouteBtn.setClickable(false);
+                stopBtn.setClickable(false);
+                clearBtn.setClickable(false);
+
+                //change the text of the toggle
+                activeSwitch.setText(R.string.switch_active);
+                //change the state of the toggle
+                activeSwitch.setChecked(true);
+
+                //start race button dissappears
+                startRaceBtn.setVisibility(View.INVISIBLE);
+                //stop race button appears
+                stopRaceBtn.setVisibility(View.VISIBLE);
+
+                racingAGhost = true;
+
+                timerFunctionality.setBase(SystemClock.elapsedRealtime());
+                timerFunctionality.start();
+
+
+            }
+
+
+        });
+
+        // When the stop race button is clicked (button is only available when the user is currently racing a ghost
+        stopRaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d("GHOST-TEST", "Stopping the race");
+
+                //make all of the other UI buttons not-clickable
+                routesBtn.setClickable(true);
+                newRouteBtn.setClickable(true);
+                stopBtn.setClickable(true);
+                clearBtn.setClickable(true);
+
+                //change the text of the toggle
+                activeSwitch.setText(R.string.switch_offline);
+                //change the state of the toggle
+                activeSwitch.setChecked(false);
+
+                racingAGhost = false;
+
+                stopRaceBtn.setVisibility(View.INVISIBLE);
+                startRaceBtn.setVisibility(View.VISIBLE);
+
+                timerFunctionality.stop();
+                timerFunctionality.setBase(SystemClock.elapsedRealtime());
+
+                ghostCounter = -1;
+
+
+            }
+
+        });
+
         // When the New Route button is pressed, starts the route making process
         newRouteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -427,6 +504,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (intent == null) return;
 
             selectedID = intent.getIntExtra(ROUTE_ID, -1);
+
+            Log.d("GHOST-TEST", "selectedID: " + selectedID);
+
             routesInformation = (ArrayList<Route>) intent.getSerializableExtra(ROUTES_INFO);
 
             if (routesInformation == null){
@@ -442,6 +522,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             selectedRoute = routesInformation.get(selectedID);
             drawRoute(selectedRoute);
+            //move camera to start of the route
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedRoute.getPoint(0).getLocation(),DEFAULT_ZOOM));
+            //show the button to start the race against the ghost on the selected route
+            showGhostRaceButton();
+
         }
     }
 
@@ -485,6 +570,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             drawRoute(demoRoutes.get(i));
         }
 
+    }
+
+    public void showGhostRaceButton() {
+        startRaceBtn.setVisibility(View.VISIBLE);
     }
 
 
@@ -743,28 +832,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
     private void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
 
+        //keep the map clean from previous runs
+        if(ghostCounter == 0) {
+            clearMap();
+            drawRoute(selectedRoute);
+        }
+
+        //remove the previously drawn ghost
         clearGhosts();
 
-        Log.d("GHOST TEST", "timeWhenHappenned: "+ timeWhenHappenned);
+        ghostCounter++;
 
-        for(int i = 0; i < currentRoute.getSize(); i++) {
-            Log.d("GHOST TEST", "currentRoute.getPoint(i).getTime(): "+ currentRoute.getPoint(i).getTime());
-
-            if(currentRoute.getPoint(i).getTime() == timeWhenHappenned) {
-
-                Log.d("GHOST TEST","Current Ghost location found");
-
-                //draw the ghost to the map
-                Circle ghostCircle = mMap.addCircle(new CircleOptions()
-                        .center(currentRoute.getPoint(i).getLocation())
-                        .radius(5)
-                        .strokeColor(Color.BLACK)
-                        .fillColor(Color.BLACK));
-
-                ghostCircles.add(ghostCircle);
-
-            }
+        //if the user is taking longer than the ghost, have the ghost wait at the finish line
+        if(ghostCounter >= selectedRoute.getSize()) {
+            ghostCounter = selectedRoute.getSize() -1;
         }
+
+
+        //make a new ghost at the current point where the ghost is in the race
+        Circle ghostCircle = mMap.addCircle(new CircleOptions()
+                .center(selectedRoute.getPoint(ghostCounter).getLocation())
+                .radius(8)
+                .strokeColor(Color.BLACK)
+                .fillColor(Color.BLACK));
+
+        ghostCircles.add(ghostCircle);
+
+
+
 
     }
 
