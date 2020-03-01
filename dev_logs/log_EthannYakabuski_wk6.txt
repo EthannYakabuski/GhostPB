@@ -10,3 +10,6 @@ Written portion of D2 document, along with presentation slides finished & submit
 
 1 hour and 30 minutes: 
 Group meeting
+
+6 hours: 
+implemented persistent storage
