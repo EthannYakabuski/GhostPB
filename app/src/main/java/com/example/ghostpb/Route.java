@@ -53,15 +53,15 @@ public class Route implements Parcelable {
         //for each point for this route add its information to the string
         for(int i = 0; i < routePoints.size(); i++) {
 
-            returnString = returnString + "/?/";
+            returnString = returnString + "//";
             returnString = returnString + routePoints.get(i).getLocation().latitude;
-            returnString = returnString + ",";
+            returnString = returnString + "//";
             returnString = returnString + routePoints.get(i).getLocation().longitude;
-            returnString = returnString + "/!/";
+            returnString = returnString + "//";
 
             //this is our last route point in the route, add finishing characters
             if(i == routePoints.size()-1) {
-                returnString = returnString + "!!!!!";
+                returnString = returnString + "!!!!!//";
             }
         }
 
@@ -87,6 +87,11 @@ public class Route implements Parcelable {
         routePoints = rp;
         routeID = id;
         routeName = "Route " + Integer.toString(id);
+    }
+    public Route(ArrayList<RoutePoint> rp, int id, String name) {
+        routePoints = rp;
+        routeID = id;
+        routeName = name;
     }
     public Route(String name) {
         routeID = 9001;
