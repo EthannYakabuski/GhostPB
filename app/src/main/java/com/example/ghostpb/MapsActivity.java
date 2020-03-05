@@ -314,6 +314,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     builder.setNegativeButton(R.string.dialog_delete_title, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             // User cancelled the dialog - do not save the route
+                            routesInformation.remove(routeNumber);
                             Toast toast = Toast.makeText(MapsActivity.this, "Route not saved", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
                             toast.show();
