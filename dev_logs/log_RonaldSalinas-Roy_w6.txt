@@ -9,3 +9,5 @@
 	Resolved merge conflicts
 2 hours:
 	Demo prep
+30min:
+	Fixed an issue in which routes were not being deleted when the the delete button is pressed after stopping the 		creation of the new route during the naming step
