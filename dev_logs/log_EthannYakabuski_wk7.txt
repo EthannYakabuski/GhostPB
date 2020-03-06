@@ -1,0 +1,10 @@
+March 2nd - March 8th
+
+2 hrs extra group meeting on Tuesday
+
+30 minutes practice script for D2
+
+2 hrs group meeting Thursday
+
+2 hrs addressed bugs in persistent storage and performance issues for large routes, tested on Pixel emulator, Galaxy Nexus emulator and ZTE Z557BL physical device
+
