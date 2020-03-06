@@ -43,7 +43,7 @@ public class RoutePoint implements Parcelable {
         returnString = returnString + "//";
         returnString = returnString + Double.toString(location.longitude);
 
-        Log.d("FILE-TEST", "to string route point: " + returnString);
+        //Log.d("FILE-TEST", "to string route point: " + returnString);
 
         return returnString;
 
