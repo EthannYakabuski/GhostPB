@@ -2,6 +2,7 @@ package com.example.ghostpb;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.Polyline;
 
@@ -29,6 +30,46 @@ public class Route implements Parcelable {
     void setName(String rN) { routeName = rN; }
     void setRoutePoints(ArrayList<RoutePoint> rp) { routePoints = rp; }
 
+
+    //this function returns in a string:
+    // 'routeName' // 'routeID' // 'sizeOfRoutePoints' // +
+    // for each routepoint in routepoints:
+       //add to string '/\/' + routePoint.latitude + ',' + routePoint.longitude + '/\/'
+    // end of file + '?/\!'
+
+    @Override
+    public String toString() {
+
+        String returnString = "";
+
+        //add header informatin for this route
+        returnString = returnString + routeName;
+        returnString = returnString + "//";
+        returnString = returnString + Integer.toString(routeID);
+        returnString = returnString + "//";
+        returnString = returnString + Integer.toString(routePoints.size());
+        returnString = returnString + "//";
+
+        //for each point for this route add its information to the string
+        for(int i = 0; i < routePoints.size(); i++) {
+
+            //returnString = returnString + "//";
+            returnString = returnString + routePoints.get(i).getLocation().latitude;
+            returnString = returnString + "//";
+            returnString = returnString + routePoints.get(i).getLocation().longitude;
+            returnString = returnString + "//";
+
+            //this is our last route point in the route, add finishing characters
+            if(i == routePoints.size()-1) {
+                //returnString = returnString + "!!!!!//";
+            }
+        }
+
+        //Log.d("FILE-TEST", "to string route: " + returnString);
+
+        return returnString;
+    }
+
     //sets the backing arraylist to the given arraylist of RoutePoints
     public void setAllRoutePoints(ArrayList<RoutePoint> rp) {
         routePoints = rp;
@@ -46,6 +87,11 @@ public class Route implements Parcelable {
         routePoints = rp;
         routeID = id;
         routeName = "Route " + Integer.toString(id);
+    }
+    public Route(ArrayList<RoutePoint> rp, int id, String name) {
+        routePoints = rp;
+        routeID = id;
+        routeName = name;
     }
     public Route(String name) {
         routeID = 9001;
