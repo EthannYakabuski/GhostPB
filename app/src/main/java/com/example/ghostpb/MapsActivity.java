@@ -54,6 +54,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -134,12 +136,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button stopRaceBtn;
     private Switch activeSwitch;
 
-    private static final String EXTRA_MESSAGE = "com.example.ghostpb.MESSAGE";
     private static final String ROUTE_TAG = "ROUTE";
     private static final String TEST_TAG = "ROUTE TEST";
     private static final int DISPLAY_ROUTES_CODE = 0;
     private static final String ROUTE_ID = "routeID";
     private static final String ROUTES_INFO = "routesInfo";
+    private static final String CHAR_FILTER = "^[a-zA-Z0-9!@#$&()`.+,/\\\"]*$";
+    private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
 
     // textview for distance tracker
     private TextView distanceCounter;
@@ -250,10 +253,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 Log.d(ROUTE_TAG, "Stop button clicked");
 
-                //set the buttons to be clickable again
-                routesBtn.setClickable(true);
-                newRouteBtn.setClickable(true);
-
                 //update the text associated with the switch
                 activeSwitch.setText(R.string.switch_offline);
 
@@ -279,6 +278,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(currentlyMakingARoute) {
                     currentlyMakingARoute = false;
 
+                    // Make the buttons unclickable so not pressed before finished with Dialog
+                    clearBtn.setClickable(false);
+                    stopBtn.setClickable(false);
+                    routesBtn.setClickable(false);
+                    newRouteBtn.setClickable(false);
+
                     // get input for the name of the route
 
                     // This is a popup box that will take input
@@ -300,7 +305,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void onClick(DialogInterface dialog, int id) {
                             // User clicked Enter button - Rename the route from the EditText if not empty, etc.
                             String newName = input.getText().toString().trim();
-                            if (!newName.isEmpty()) {
+                            if (!newName.isEmpty() && !CHAR_PATTERN.matcher(newName).matches()) {
                                 // Set route name
                                 routesInformation.get(routeNumber).setName(newName);
 
@@ -316,9 +321,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 routesInformation.get(routeNumber).setName("Unnamed Route");
 
                                 // A toast pop up for invalid input. Will put route name to default
-                                Toast toast = Toast.makeText(MapsActivity.this, "Unnamed Route saved", Toast.LENGTH_SHORT);
+                                Toast toast = Toast.makeText(MapsActivity.this, "Invalid Input. Unnamed Route saved", Toast.LENGTH_SHORT);
                                 toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
                                 toast.show();
+
+                                clearBtn.setClickable(true);
+                                stopBtn.setClickable(true);
+                                routesBtn.setClickable(true);
+                                newRouteBtn.setClickable(true);
                             }
 
                         }
@@ -327,10 +337,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void onClick(DialogInterface dialog, int id) {
                             // User cancelled the dialog - do not save the route
                             routesInformation.remove(routeNumber);
+                            routeNumber = routesInformation.size();
                             Toast toast = Toast.makeText(MapsActivity.this, "Route not saved", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
                             toast.show();
 
+                            clearBtn.setClickable(true);
+                            stopBtn.setClickable(true);
+                            routesBtn.setClickable(true);
+                            newRouteBtn.setClickable(true);
                         }
                     });
                     AlertDialog dialog = builder.create();
@@ -928,9 +943,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     routesInformation.get(routeNumber).addPoint(new RoutePoint(locationNow, timeWhenHappenned));
                                     // calculate the total distance of the route to this point
                                     totalDistance = calculateDistance(routesInformation.get(routeNumber));
-                                    String distanceText = String.format("Total Distance: %f Meters", totalDistance);
+                                    String distanceText = String.format(Locale.CANADA, "Total Distance: %f Meters", totalDistance);
                                     distanceCounter.setText(distanceText);
-
                                 }
 
 
