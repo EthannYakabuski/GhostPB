@@ -9,5 +9,5 @@ March 2nd - March 8th
 2 hrs addressed bugs in persistent storage and performance issues for large routes, tested on Pixel emulator, Galaxy Nexus emulator and ZTE Z557BL physical device
 
 The persistent storage custom file scheme uses 562 bits per second of saved route time. (plus approximately 100 bits for route names and sizes depending on how long the user has named their route)
-This equates to approximately 1mb of saved data when in raw form in the phone files per 4 hours of saved routes.
+This equates to approximately 8mb of saved data when in raw form in the phone files per 4 hours of saved routes.
 
