@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class displayAvailableRoutesActivity extends AppCompatActivity {
 
@@ -37,6 +38,8 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
     private static final String ROUTE_TAG = "ROUTE";
     private static final String ROUTE_ID = "routeID";
     private static final String ROUTES_INFO = "routesInfo";
+    private static final String CHAR_FILTER = "^[a-zA-Z0-9!@#$&()`.+,/\\\"]*$";
+    private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +140,7 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         // User clicked Enter button - Rename the route from the EditText if not empty, etc.
                         String newName = input.getText().toString().trim();
-                        if (!newName.isEmpty()) {
+                        if (!newName.isEmpty() && !CHAR_PATTERN.matcher(newName).matches()) {
                             // Update names, routes info, and list items
                             routesInformation.get(selectedRoute).setName(newName);
                             routeNames.set(selectedRoute, newName);
@@ -207,7 +210,6 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
                         // Remove the route from the names, routes info, and item list
                         String route = adapter.getItem(selectedRoute);
                         routesInformation.remove(selectedRoute);
-                        routeNames.remove(selectedRoute);
                         adapter.remove(route);
                         adapter.notifyDataSetChanged();
 
@@ -240,6 +242,17 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
                 noSelection();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed(){
+        Log.d(ROUTE_TAG, "Android Back button clicked");
+        //create an intent holding the route clicked and updated routes info to send back to the parent activity
+        Intent data = new Intent(displayAvailableRoutesActivity.this, MapsActivity.class);
+        data.putExtra(ROUTES_INFO, routesInformation);
+        setResult(RESULT_OK, data);
+        Log.d(ROUTE_TAG, "Routes: " + routeNames);
+        finish();
     }
 
     // The default view when nothing in the listview is selected

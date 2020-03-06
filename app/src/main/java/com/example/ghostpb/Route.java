@@ -40,12 +40,12 @@ public class Route implements Parcelable {
 
     Route(int id) {
         routeID = id;
-        routeName = "Route " + Integer.toString(id);
+        routeName = "Unnamed Route";
     }
     public Route(ArrayList<RoutePoint> rp, int id) {
         routePoints = rp;
         routeID = id;
-        routeName = "Route " + Integer.toString(id);
+        routeName = "Unnamed Route";
     }
     public Route(String name) {
         routeID = 9001;
