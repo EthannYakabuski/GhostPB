@@ -1,0 +1,9 @@
+2 hours:
+  Group meeting 
+  
+2.5 hours:
+	onBackPressed() for displayRoutesActivity to MapsActivity
+	EditText String filtering - https://stackoverflow.com/questions/47216846/regular-expression-to-filter-special-characters-not-working
+	Fixed a route deletion issue in the displayRoutesActivity
+	Dealt with a crash that could happen if the user creates and stops routes in quick succession
+  Other minor changes
