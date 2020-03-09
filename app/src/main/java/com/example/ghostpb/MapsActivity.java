@@ -313,6 +313,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Toast toast = Toast.makeText(MapsActivity.this, newName + " saved", Toast.LENGTH_SHORT);
                                 toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
                                 toast.show();
+                                
+                                clearBtn.setClickable(true);
+                                stopBtn.setClickable(true);
+                                routesBtn.setClickable(true);
+                                newRouteBtn.setClickable(true);
 
                                 //when a new route is created remake the saved route file
                                 writeFile();
