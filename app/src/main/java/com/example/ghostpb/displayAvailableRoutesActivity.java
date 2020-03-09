@@ -38,7 +38,7 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
     private static final String ROUTE_TAG = "ROUTE";
     private static final String ROUTE_ID = "routeID";
     private static final String ROUTES_INFO = "routesInfo";
-    private static final String CHAR_FILTER = "^[a-zA-Z0-9!@#$&()`.+,/\\\"]*$";
+    private static final String CHAR_FILTER = "^[!@#$&()`.+,/\\\"]*$";
     private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
 
     @Override
