@@ -7,3 +7,8 @@
   Fixed a route deletion issue in the displayRoutesActivity
   Dealt with a crash that could happen if the user creates and stops routes in quick succession
   Other minor changes
+
+1 hour:
+  Getting the route end time to be passed to the displayRoutesActivity
+  Brainstormed how I would like to display the time when selecting a route in that activity
+  Little fixes
