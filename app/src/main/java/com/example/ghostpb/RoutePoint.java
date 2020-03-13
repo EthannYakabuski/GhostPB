@@ -7,7 +7,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.sql.Time;
-
+/* TO-DO: integrate RoutePointDataClass */
 
 //class for holding a LatLng object and a Time object,
 //over the course of making a route the user will generate many of these,
@@ -19,17 +19,17 @@ public class RoutePoint implements Parcelable {
     //holds a time object that was created when the user was at the above location
     private long timeAtLocation;
 
+    //holds the data class for this routepoint
+    private RoutePointDataClass pointData;
+
     //returns the LatLng object private variable location
     LatLng getLocation() {
-
         return location;
     }
 
     //returns the Time object associated with the above LatLng object
     public long getTime() {
-
         return timeAtLocation;
-
     }
 
 
@@ -55,6 +55,10 @@ public class RoutePoint implements Parcelable {
         location = latLngObj;
         timeAtLocation = time;
 
+        //new code
+        //set the data class
+        //pointData = new RoutePointDataClass(latLngObj, time);
+        //new code end
     }
 
     // Parcels are for being able to pass the Object through the intents
