@@ -1,0 +1,17 @@
+February 9th - 15th
+Tuesday 10th: 
+8 hours making sequence diagrams, class diagram and writing in the D3 doc about architecture styles and design patterns. 
+
+Wednesday 11th: 
+2 hours brainstorming potential design pattern refactors
+
+Thursday 12th: 
+2:30 hours group meeting
+1:30 hours writing (not integrating) new design pattern code
+:30 minutes adding to the D3 doc talking about above design patterns, and part 3. 
+
+Friday 13th - Sunday 15th
+TODO: 
+Finish class diagram -> based on the new refactored design patterns
+Integrate design pattern changes into mapsActivity.java
+
