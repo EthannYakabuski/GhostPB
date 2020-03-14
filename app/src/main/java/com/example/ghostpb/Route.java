@@ -14,6 +14,7 @@ public class Route implements Parcelable {
     private ArrayList<Polyline> routeLines = new ArrayList<>();
     private int routeID;
     private String routeName;
+    private long time;
 
     //adds the given RoutePoint object to the backing arraylist
     void addPoint(RoutePoint p) {
@@ -30,11 +31,13 @@ public class Route implements Parcelable {
     void setName(String rN) { routeName = rN; }
     void setRoutePoints(ArrayList<RoutePoint> rp) { routePoints = rp; }
 
+    void setTime(long t) { time = t; }
+    long getTime() { return time; }
 
     //this function returns in a string:
     // 'routeName' // 'routeID' // 'sizeOfRoutePoints' // +
     // for each routepoint in routepoints:
-       //add to string '/\/' + routePoint.latitude + ',' + routePoint.longitude + '/\/'
+    //add to string '/\/' + routePoint.latitude + ',' + routePoint.longitude + '/\/'
     // end of file + '?/\!'
 
     @Override
@@ -82,27 +85,33 @@ public class Route implements Parcelable {
     Route(int id) {
         routeID = id;
         routeName = "Unnamed Route";
+        time = 0;
     }
     public Route(ArrayList<RoutePoint> rp, int id) {
         routePoints = rp;
         routeID = id;
         routeName = "Unnamed Route";
+        time = 0;
     }
     public Route(ArrayList<RoutePoint> rp, int id, String name) {
         routePoints = rp;
         routeID = id;
         routeName = name;
+        time = 0;
     }
+
     public Route(String name) {
         routeID = 9001;
         routeName = name;
+        time = 0;
     }
 
     // Parcels are for being able to pass the Object through the intents
-    public Route(Parcel in){
+    private Route(Parcel in){
         routeID = in.readInt();
         routeName = in.readString();
         routePoints = (ArrayList<RoutePoint>) in.readArrayList(RoutePoint.class.getClassLoader());
+        time = in.readLong();
     }
 
     @Override
@@ -114,6 +123,7 @@ public class Route implements Parcelable {
         dest.writeInt(routeID);
         dest.writeString(routeName);
         dest.writeList(routePoints);
+        dest.writeLong(time);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
