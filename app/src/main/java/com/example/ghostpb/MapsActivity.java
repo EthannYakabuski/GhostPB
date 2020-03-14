@@ -16,6 +16,7 @@ import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -126,6 +127,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //variable for working with periodic location updates provided by the fused location provider;
     private LocationCallback locationCallback;
+
+    // The end time for a route
+    private long endTime = 0;
 
     //buttons for the click event listeners
     private Button clearBtn;
@@ -265,6 +269,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //stop the timer
                 timerFunctionality.stop();
 
+                // Get the time it took
+                endTime = (SystemClock.elapsedRealtime() - timerFunctionality.getBase()) / 1000;
+                Log.d(ROUTE_TAG, "Time: " + DateUtils.formatElapsedTime(endTime));
+
                 //reset the variable keeping track of user location for live drawing of their route
                 lastPoint = new LatLng(0, 0);
 
@@ -309,6 +317,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 // Set route name
                                 routesInformation.get(routeNumber).setName(newName);
 
+                                // Set the time
+                                routesInformation.get(routeNumber).setTime(endTime);
+
                                 // A toast will pop up showing success
                                 Toast toast = Toast.makeText(MapsActivity.this, newName + " saved", Toast.LENGTH_SHORT);
                                 toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
@@ -324,6 +335,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                             else{
                                 routesInformation.get(routeNumber).setName("Unnamed Route");
+
+                                // Set the time
+                                routesInformation.get(routeNumber).setTime(endTime);
 
                                 // A toast pop up for invalid input. Will put route name to default
                                 Toast toast = Toast.makeText(MapsActivity.this, "Invalid Input. Unnamed Route saved", Toast.LENGTH_SHORT);
