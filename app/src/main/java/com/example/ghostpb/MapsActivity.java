@@ -98,7 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int selectedID = -1;
 
     //access to the chronometer
-    private Chronometer timerFunctionality;
+    protected Chronometer timerFunctionality;
     private boolean chronometerRunning;
 
     //variables used to help draw the route live
@@ -1266,7 +1266,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //this function will request all routes to toString themselves
     //it will then write each route to a new file which replace the old one stored
-    private void writeFile() {
+    protected void writeFile() {
 
         String saveData = "";
 
@@ -1304,7 +1304,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
 
+    }
 
+    protected void setRoutesInformation(ArrayList<Route> routesInformation){
+        this.routesInformation = routesInformation;
+    }
+
+    protected void setRouteNumber(int routeNumber){
+        this.routeNumber = routeNumber;
     }
 
 }
