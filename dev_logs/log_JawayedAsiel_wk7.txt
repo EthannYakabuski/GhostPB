@@ -1,0 +1,8 @@
+1 hour spent practicing D3 presentation
+
+2 hour group meeting
+Notified chronometer was not compatible with other group member's work.
+
+3 hours spent reading android chronometer's source code and working on a class that extends it to get all functionality
+
+
