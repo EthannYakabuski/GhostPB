@@ -7,3 +7,5 @@
     and an Abstract displayAvailableRoutesFunctions
   - more work on MapEvents 
   - minor changes
+30min:
+  - D3
