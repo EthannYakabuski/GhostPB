@@ -11,7 +11,6 @@ Thursday 12th:
 :30 minutes adding to the D3 doc talking about above design patterns, and part 3. 
 
 Friday 13th - Sunday 15th
-TODO: 
-Finish class diagram -> based on the new refactored design patterns
-Integrate design pattern changes into mapsActivity.java
+3 hours making architecture diagrams and updating class diagram to current state of project at D3 submission deadline
+1 hour editing D3 doc
 
