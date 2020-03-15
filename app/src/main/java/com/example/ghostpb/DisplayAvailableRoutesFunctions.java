@@ -6,16 +6,38 @@ import android.widget.Button;
 
 import java.util.ArrayList;
 
-public class DisplayAvailableRoutesFunctions {
+public abstract class DisplayAvailableRoutesFunctions {
 
     private ArrayList<Route> routesInformation;
     private int selectedRoute;
     private View selectedView;
 
+
+    /* Singleton */
+/*
+    private static final DisplayAvailableRoutesFunctions ourInstance = new DisplayAvailableRoutesFunctions();
+
+    public static DisplayAvailableRoutesFunctions getInstance() {
+        return ourInstance;
+    }
+
+    protected DisplayAvailableRoutesFunctions(){}
+
+ */
+
+    /* Singleton */
+
+
+/*
     DisplayAvailableRoutesFunctions(ArrayList<Route> routesInformation){
         this.routesInformation = routesInformation;
     }
 
+
+    protected void init(ArrayList<Route> routesInformation){
+        this.routesInformation = routesInformation;
+    }
+    */
     protected void setRoutesInformation(ArrayList<Route> routesInformation){
         this.routesInformation = routesInformation;
     }
