@@ -1,0 +1,9 @@
+3 Hours:
+  - Group meeting 
+  - Decomposing MapsActivity into MapEvents 
+  - Fixed incorrect values being stored for the Route end times 
+6.5 Hours:
+  - Decomposed displayAvailableRoutesActivity into a Singleton displayAvailableRoutesEvents 
+    and an Abstract displayAvailableRoutesFunctions
+  - more work on MapEvents 
+  - minor changes
