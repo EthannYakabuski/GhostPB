@@ -41,9 +41,21 @@ public class DisplayAvailableRoutesEvents extends DisplayAvailableRoutesFunction
     private static final String CHAR_FILTER = "^[!@#$&()`.+,/\\\"]*$";
     private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
 
-    DisplayAvailableRoutesEvents(final Context displayAvailableRoutes, ArrayList<Route> routesInformation){
+    /* Singleton */
+    private static final DisplayAvailableRoutesEvents ourInstance = new DisplayAvailableRoutesEvents();
 
-        super(routesInformation);
+    public static DisplayAvailableRoutesEvents getInstance() {
+        return ourInstance;
+    }
+
+    private DisplayAvailableRoutesEvents() {
+        super();
+    }
+    /* Singleton */
+
+    protected void init(final Context displayAvailableRoutes, ArrayList<Route> routesInformation){
+
+        setRoutesInformation(routesInformation);
 
         final Context dar = displayAvailableRoutes;
 

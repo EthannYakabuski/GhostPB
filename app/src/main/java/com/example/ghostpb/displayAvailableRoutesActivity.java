@@ -27,7 +27,8 @@ public class displayAvailableRoutesActivity extends AppCompatActivity {
         //receive the array list of routes informaton from the intent
         routesInformation = intent.getParcelableArrayListExtra(ROUTES_INFO);
 
-        dare = new DisplayAvailableRoutesEvents(displayAvailableRoutesActivity.this, routesInformation);
+        dare = DisplayAvailableRoutesEvents.getInstance();
+        dare.init(displayAvailableRoutesActivity.this, routesInformation);
     }
 
     @Override
