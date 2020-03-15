@@ -2,9 +2,9 @@
 package com.example.ghostpb;
 
 public class routeArray {
-    public String[] s;
-    public int capacity;
-    public int size;
+    private String[] s;
+    private int capacity;
+    private int size;
 
     public routeArray(int capacity) {
         this.capacity = capacity;
