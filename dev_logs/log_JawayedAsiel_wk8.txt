@@ -1,0 +1,5 @@
+3 hour group meeting
+
+2 hour completing chronometer + revising to work with default chronometer provided functionality
+
+4 hours spent researching design patterns and attempting to implement it into the chronometer. Did not succeed.
