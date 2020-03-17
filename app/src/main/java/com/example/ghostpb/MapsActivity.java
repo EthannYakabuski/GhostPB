@@ -63,6 +63,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //the map
     private GoogleMap mMap;
 
+    private DrawingFacade drawingFacade;
+
     //fused location provider
     //use this to access current locaation information in the form of a LatLng object
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -387,7 +389,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 Log.d(ROUTE_TAG, "Clear button clicked");
 
-                clearMap();
+                //clearMap();
+                drawingFacade.clearMap();
             }
         });
  
@@ -572,7 +575,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (selectedID < 0) return;
 
             selectedRoute = routesInformation.get(selectedID);
-            drawRoute(selectedRoute);
+
+            //draw the selected route to the screen
+            //drawRoute(selectedRoute);
+
+            //draw the selected route to the screen new refactor
+            drawingFacade.drawRoute(selectedRoute);
+
             //move camera to start of the route
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedRoute.getPoint(0).getLocation(),DEFAULT_ZOOM));
             //show the button to start the race against the ghost on the selected route
@@ -595,6 +604,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        drawingFacade = new DrawingFacade(mMap);
 
         //calls the custom function to ask the user for location permissions
         requestLocationPermissions();
@@ -886,12 +897,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //keep the map clean from previous runs
         if(ghostCounter == 0) {
-            clearMap();
-            drawRoute(selectedRoute);
+            //clear the map
+            //clearMap();
+
+            //clear the map new refactor
+            drawingFacade.clearMap();
+
+
+            //drawRoute(selectedRoute);
+            drawingFacade.drawRoute(selectedRoute);
         }
 
         //remove the previously drawn ghost
-        clearGhosts();
+        //clearGhosts();
+
+        //remove the previous drawn ghost refactor
+        drawingFacade.clearGhosts();
 
         ghostCounter++;
 
@@ -942,8 +963,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 locationNow = new LatLng(roamingLocation.getLatitude(), roamingLocation.getLongitude());
                                 //if the user is currently making a route, add this information to the temporary store of the route points
 
-                                drawRouteLive(lastPoint, locationNow);
+                                //draw the route live
+                                //drawRouteLive(lastPoint, locationNow);
 
+
+                                //draw the route live new refactor
+                                drawingFacade.drawRouteLive(lastPoint, locationNow);
 
                                 lastPoint = locationNow;
 
@@ -952,7 +977,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     ghostPointLocation++;
                                     Log.d("GHOST TEST", "Racing against a ghost");
 
-                                    updateGhostLocation(activeGhostRoute, ghostPointLocation);
+                                    //updateGhostLocation(activeGhostRoute, ghostPointLocation);
+
+                                    //new refactor updateGhostLocation
+                                    drawingFacade.updateGhostLocation(selectedRoute, ghostPointLocation);
 
                                 }
 
