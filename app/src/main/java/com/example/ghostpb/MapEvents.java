@@ -241,7 +241,7 @@ public class MapEvents {
             public void onClick(View v) {
                 Log.d(ROUTE_TAG, "Clear button clicked");
 
-                ((MapsActivity) mapsActivity).clearMap();
+                ((MapsActivity) mapsActivity).drawingFacade.clearMap();
             }
         });
 

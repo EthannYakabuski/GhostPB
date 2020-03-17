@@ -63,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //the map
     private GoogleMap mMap;
 
-    private DrawingFacade drawingFacade;
+    public DrawingFacade drawingFacade;
 
     //fused location provider
     //use this to access current locaation information in the form of a LatLng object
@@ -194,10 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         timerFunctionality = findViewById(R.id.timerChronometer);
         timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
-
-
-        //add the routes for DEMO D2
-        populateDemoRoutes();
 
         //the function that is called every second when the chronometer ticks
         //in our case we cant to update the users location and save the route point to the proper route in the backing arraylist
@@ -592,7 +588,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -626,147 +621,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
-    public void showDemoRoutes() {
-
-        for(int i = 0; i < demoRoutes.size(); i++) {
-            drawRoute(demoRoutes.get(i));
-        }
-
-    }
-
     public void showGhostRaceButton() {
         startRaceBtn.setVisibility(View.VISIBLE);
     }
 
 
-    //this function populates the 'simulated' routes for use with DEMO D2
-    //simulated routes can be created by using this resource: https://getlatlong.net
-
-    //TO PLAY SCENARIO 1 for DEMO D2
-    //see campusAveUserRoute.gpx in github 'folder gpx files'
-    //https://mapstogpx.com/ to create a gpx file from a google maps direction link
-
-    //TO PLAY GPX FILE:
-    //hit '...' on emulated phone options bar at the bottom
-    //hit location tab top right
-    //hit Load GPS/KML button on bottom left
-    //choose speed and hit play (comments below reflect that of a 1x speed playback)
-    public void populateDemoRoutes() {
-
-        Route campusAveLoop = new Route("Campus Ave Loop");
-
-        //draws a line down Campus ave. Carleton University -- continue later
-
-        //user is ahead of the ghost
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385408, -75.696361), 1));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385378, -75.696359), 2));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385310,-75.696372), 3));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385250, -75.696364), 4));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385197, -75.696367), 5));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385125, -75.696364), 6));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.385065,-75.696361), 7));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384990, -75.696364), 8));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384922, -75.696361), 9));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384877, -75.696364), 10));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384820, -75.696372), 11));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384752, -75.696370), 12));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384647, -75.696367), 13));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384587, -75.696364), 14));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384492, -75.696356), 15));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384440, -75.696353), 16));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384370, -75.696364), 17));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384291, -75.696351),18));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384238, -75.696348), 19));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384174, -75.696351), 20));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384129,-75.696353 ), 21));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.384080,-75.696345 ), 21));
-        //user has built a substantial lead on the ghost, but is not travelling slower
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383997,-75.696337 ), 22));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383941, -75.696340), 23));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383903, -75.696332), 24));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383835,-75.696329 ), 25));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383782, -75.696311), 26));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383465,-75.696246), 27));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383391 ,-75.696226 ), 28));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.383142 ,-75.696116 ), 29));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382970 ,-75.696037 ), 30));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382758 ,-75.695934 ), 31));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382713 ,-75.695900), 32));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382540 ,-75.695809 ), 33));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382395 ,-75.695694 ), 34));
-        //the ghost has quickly closed the distance
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382295 ,-75.695568 ), 35));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382244 ,-75.695436), 36));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382274 ,-75.695286 ), 37));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382317 ,-75.695138 ), 38));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382367 ,-75.694985 ), 39));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382433 ,-75.694854 ), 40));
-        campusAveLoop.addPoint(new RoutePoint(new LatLng(45.382483 ,-75.694694 ), 41));
-        //finish behind the ghost
-
-        demoRoutes.add(campusAveLoop);
-
-        //activeGhostRoute = demoRoutes.get(0);
-
-        //racingAGhost = true;
-
-        //showDemoRoutes();
-
-    }
-
-
-    public void clearGhosts() {
-
-        for(int i = 0; i < ghostCircles.size(); i++) {
-
-            ghostCircles.get(i).remove();
-
-        }
-
-        ghostCircles.clear();
-    }
-
-
-    //this function clears everything that has been drawn on the map so far
-    public void clearMap() {
-
-        //for each polyline that has been drawn to the map
-        for(int i = 0; i < polyLines.size(); i++) {
-
-            //remove the polyline stored at this index
-            polyLines.get(i).remove();
-        }
-
-        //empty the array holding the drawn polylines
-        polyLines.clear();
-        //mMap.clear();
-
-        //if there is still a gost lingering on the map
-        if(ghostCircles.size() >= 1) {
-            clearGhosts();
-        }
-    }
-
-
-
-
-    //this custom function draws the route live while the user is making it
-    public void drawRouteLive(LatLng previous, LatLng current) {
-
-        //if there is actual information in the last point
-        if (!(previous.longitude == 0)) {
-            //draws the poly line on the map between the previous point and the current point
-            Polyline line = mMap.addPolyline(new PolylineOptions()
-                    .add(previous, current)
-                    .width(5)
-                    .color(Color.BLUE));
-
-            polyLines.add(line);
-        }
-    }
-    //this function will start requesting the users location every second and saving
-    //LatLng objects along with time information to create ghost data at the end of the session
     public void startRoute(View view) {
 
         //Task<Location> currentLocation = fusedLocationProviderClient.getLastLocation();
@@ -864,75 +723,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.e("Exception: %s", e.getMessage());
             }
         }
-
-    }
-
-
-    private void drawRoute(Route route) {
-
-        Log.d(ROUTE_TAG, "Drawing route: " + selectedRoute.getName());
-
-        for(int i = 1; i < route.getSize(); i++) {
-
-            /**
-            Polyline testLine = mMap.addPolyline(new PolylineOptions()
-                    .add(new LatLng(45.3826692, -75.6979663), new LatLng(46.3826692, -75.6979663))
-                    .width(5)
-                    .color(Color.RED));
-             */
-
-            Polyline line = mMap.addPolyline(new PolylineOptions()
-                    .add(route.getPoint(i-1).getLocation(), route.getPoint(i).getLocation())
-                    .width(5)
-                    .color(Color.RED));
-
-            polyLines.add(line);
-        }
-
-    }
-
-
-    //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
-    private void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
-
-        //keep the map clean from previous runs
-        if(ghostCounter == 0) {
-            //clear the map
-            //clearMap();
-
-            //clear the map new refactor
-            drawingFacade.clearMap();
-
-
-            //drawRoute(selectedRoute);
-            drawingFacade.drawRoute(selectedRoute);
-        }
-
-        //remove the previously drawn ghost
-        //clearGhosts();
-
-        //remove the previous drawn ghost refactor
-        drawingFacade.clearGhosts();
-
-        ghostCounter++;
-
-        //if the user is taking longer than the ghost, have the ghost wait at the finish line
-        if(ghostCounter >= selectedRoute.getSize()) {
-            ghostCounter = selectedRoute.getSize() -1;
-        }
-
-
-        //make a new ghost at the current point where the ghost is in the race
-        Circle ghostCircle = mMap.addCircle(new CircleOptions()
-                .center(selectedRoute.getPoint(ghostCounter).getLocation())
-                .radius(8)
-                .strokeColor(Color.BLACK)
-                .fillColor(Color.BLACK));
-
-        ghostCircles.add(ghostCircle);
-
-
-
 
     }
 
