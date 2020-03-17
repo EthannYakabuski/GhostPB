@@ -1,1 +1,2 @@
-20 minutes :: Added method to calculate time elapsed in ChronometerExtended
+30 minutes:Added method to calculate time elapsed in ChronometerExtended + change format time is displayed in routes to
+HH:MM:SS:mSmSmS format 
