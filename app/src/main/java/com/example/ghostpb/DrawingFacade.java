@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -29,6 +30,8 @@ public class DrawingFacade {
     private static final String ROUTE_TAG = "ROUTE";
     private static final String TEST_TAG = "ROUTE TEST";
 
+    private int ghostCounter = -1;
+
 
     /* singleton */
     private static final DrawingFacade ourInstance = new DrawingFacade();
@@ -37,14 +40,19 @@ public class DrawingFacade {
         return ourInstance;
     }
 
-    private DrawingFacade() {
+    DrawingFacade() {
 
+    }
+
+    DrawingFacade(GoogleMap m) {
+
+        backingMap = m;
     }
     /* singleton */
 
 
 
-    private void addMap(GoogleMap m) {
+    public void addMap(GoogleMap m) {
         backingMap = m;
     }
 
@@ -78,13 +86,13 @@ public class DrawingFacade {
 
     //clears all of the ghosts and lines on the map
     public void clearMap() {
-        clearLines();
-        clearGhosts();
+        this.clearLines();
+        this.clearGhosts();
 
     }
 
     //draws the given route to the map
-    private void drawRoute(Route route) {
+    public void drawRoute(Route route) {
 
         Log.d(ROUTE_TAG, "Drawing route: " + route.getName());
 
@@ -115,6 +123,50 @@ public class DrawingFacade {
         }
     }
 
+
+    //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
+    public void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
+
+        //keep the map clean from previous runs
+        if(ghostCounter == 0) {
+            //clear the map
+            //clearMap();
+
+            //clear the map new refactor
+            this.clearMap();
+
+
+            //drawRoute(selectedRoute);
+            this.drawRoute(currentRoute);
+        }
+
+        //remove the previously drawn ghost
+        //clearGhosts();
+
+        //remove the previous drawn ghost refactor
+        this.clearGhosts();
+
+        ghostCounter++;
+
+        //if the user is taking longer than the ghost, have the ghost wait at the finish line
+        if(ghostCounter >= currentRoute.getSize()) {
+            ghostCounter = currentRoute.getSize() -1;
+        }
+
+
+        //make a new ghost at the current point where the ghost is in the race
+        Circle ghostCircle = backingMap.addCircle(new CircleOptions()
+                .center(currentRoute.getPoint(ghostCounter).getLocation())
+                .radius(8)
+                .strokeColor(Color.BLACK)
+                .fillColor(Color.BLACK));
+
+        ghosts.add(ghostCircle);
+
+
+
+
+    }
 
 
 }
