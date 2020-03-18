@@ -1,2 +1,4 @@
 30 minutes:Added method to calculate time elapsed in ChronometerExtended + change format time is displayed in routes to
 HH:MM:SS:mSmSmS format 
+
+1 hour: Fixed issues with a updateDeviceLocation being called every tick of the chronometer. Changed to activate after 60 ticks so  it correlates to 1 call per second
