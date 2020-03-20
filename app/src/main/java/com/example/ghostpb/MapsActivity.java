@@ -189,13 +189,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
         distanceFromClosestPoint = (TextView) findViewById(R.id.distanceFromClosestPoint);
-        distanceFromClosestPoint.setVisibility(View.VISIBLE);
+        distanceFromClosestPoint.setVisibility(View.INVISIBLE);
         distanceFromClosestPoint.setText("Distance from closest point: ");
         distanceFromGhost = (TextView) findViewById(R.id.distanceFromGhost);
-        distanceFromGhost.setVisibility(View.VISIBLE);
+        distanceFromGhost.setVisibility(View.INVISIBLE);
         distanceFromGhost.setText("Distance from Ghost: ");
         onTrackText = (TextView) findViewById(R.id.isOnTrack);
-        onTrackText.setVisibility(View.VISIBLE);
+        onTrackText.setVisibility(View.INVISIBLE);
         onTrackText.setText(" USER ON TRACK: ");
 
 
@@ -968,6 +968,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //if the user is currently racing a ghost, update the ghost location on the map
                                 if(racingAGhost) {
+                                    distanceFromClosestPoint.setVisibility(View.VISIBLE);
+                                    distanceFromGhost.setVisibility(View.VISIBLE);
+                                    onTrackText.setVisibility(View.VISIBLE);
                                     ghostPointLocation++;
                                     Log.d("GHOST TEST", "Racing against a ghost");
 
@@ -1001,15 +1004,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             // Calculate distance from ghost
                                             // If the ghost has not yet finished, use the ghosts current point in its route
                                             if(ghostPointLocation < selectedRoute.getSize()) {
-                                                distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute.getPoint(ghostPointLocation).getLocation(), locationNow);
-                                                String distanceFromGhostText = String.format(Locale.CANADA, "Distance From Ghost: %.2f Meters", distanceFromGhostCount);
-                                                distanceFromGhost.setText(distanceFromGhostText);
+                                                int ghostIndex = nav.findIndexOfRoute(selectedRoute, selectedRoute.getPoint(ghostPointLocation).getLocation());
+                                                int userIndex = nav.findIndexOfRoute(selectedRoute, temp.getLocation());
+                                                String logText = String.format(" : %d", ghostIndex);
+                                                Log.d("GHOST-INDEX", logText);
+                                                String logText2 = String.format(" : %d", userIndex);
+                                                Log.d("USER-INDEX", logText2);
+                                                //distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute.getPoint(ghostPointLocation).getLocation(), locationNow);
+                                                distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute,
+                                                        selectedRoute.getPoint(ghostPointLocation).getLocation(), locationNow);
+                                                if(ghostIndex == userIndex ) {
+                                                    String distanceFromGhostText = String.format(Locale.CANADA, "GHOST IS CLOSE\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                    distanceFromGhost.setText(distanceFromGhostText);
+                                                }
+                                                else if(userIndex > ghostIndex) {
+                                                    String distanceFromGhostText = String.format(Locale.CANADA, "YOU ARE AHEAD\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                    distanceFromGhost.setText(distanceFromGhostText);
+                                                }
+                                                else {
+                                                    String distanceFromGhostText = String.format(Locale.CANADA, "GHOST IS AHEAD\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                    distanceFromGhost.setText(distanceFromGhostText);
+                                                }
                                             }
-                                            // The ghost has finished, used the last point of the ghost's route
+                                            // The ghost has finished, used the last point of the ghost's route, in this case ghost is always ahead
                                             else {
                                                 int finalPointLocation = selectedRoute.getSize()-1;
-                                                distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute.getPoint(finalPointLocation).getLocation(), locationNow);
-                                                String distanceFromGhostText = String.format(Locale.CANADA, "Distance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                //distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute.getPoint(finalPointLocation).getLocation(), locationNow);
+                                                distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute,
+                                                        selectedRoute.getPoint(finalPointLocation).getLocation(), locationNow);
+                                                String distanceFromGhostText = String.format(Locale.CANADA, "GHOST IS AHEAD\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
                                                 distanceFromGhost.setText(distanceFromGhostText);
                                             }
                                         }

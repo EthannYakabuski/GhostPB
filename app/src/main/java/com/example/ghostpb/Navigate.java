@@ -44,6 +44,19 @@ class Navigate {
         return totalDistance;
     }
 
+    // Returns the distance of the route from points start to end
+    // Ex: start = 5, end = 9, returns the distance from the partial Route 5:9
+    public double calculatePartialRouteDistance(Route route, int start, int end) {
+        if (route == null) { return -1; }
+        double totalDistance = 0;
+        for(int i=start; i<end; i++) {
+            LatLng p1 = route.getPoint(i).getLocation();
+            LatLng p2 = route.getPoint(i+1).getLocation();
+            totalDistance += calculateDistance(p1, p2);
+        }
+        return totalDistance;
+    }
+
     // Returns the closest point in the ghost's route to the users location
     // Takes in the ghost's route as input, and the users current location as input
     // Returns the closest point in ghost's route
@@ -96,7 +109,9 @@ class Navigate {
         if (route == null) { return -1; }
         if (p1 == null) { return -1; }
         for (int i=0; i<route.getSize()-1; i++) {
-            if(p1 == route.getPoint(i).getLocation()) {
+            // Check if the longitude and latitude are the same
+            if((p1.latitude == route.getPoint(i).getLocation().latitude)
+                    && (p1.longitude == route.getPoint(i).getLocation().longitude)) {
                 return i;
             }
         }
@@ -104,11 +119,12 @@ class Navigate {
     }
 
 
-
-    // TO DO - Implement
-    // Returns the distance from the user to the ghost.
-    // Requires Ghost's route and location as input, and user location as input
-    /*
+    // This works pretty good, but one thing sitll needs to be fixed. At the moment it works fine when
+    // userIndex == ghostIndex
+    // But otherwise, it just returns the distance of the subarray. This can be off by the distance of the
+    // user to the closest point (either + or - a bit). Shouldn't matter if the route is made and raced
+    // on foot, but it does become an issue when using bluestacks to change my locations and you end up
+    // with big jumps in location.
     public double calculateDistanceFromGhost(Route route, LatLng ghostLocation, LatLng userLocation) {
         if (route == null) { return -1; }
         if (ghostLocation == null) { return -1; }
@@ -117,19 +133,24 @@ class Navigate {
         int userIndex = findIndexOfRoute(route, closestPoint.getLocation());
         int ghostIndex = findIndexOfRoute(route, ghostLocation);
         // user > ghost -> user ahead, ghost > user -> ghost ahead, user == ghost -> close together
+        // the above checking is currently being done in MapsActivity
+        if(userIndex == -1 || ghostIndex == -1) { return -1; }
         if(userIndex == ghostIndex) {
+            // This returns the direct distance from user to ghost
             return calculateDistance(ghostLocation, userLocation);
         }
+
         else if(userIndex > ghostIndex) {
             // Find the subarray route[ghostIndex:userIndex] and then
             //calculateRouteDistance(route[ghostIndex:userIndex]);
+            return calculatePartialRouteDistance(route, ghostIndex, userIndex);
         }
         else {
             // Find the subarray route[userIndex:ghostIndex] and then
             //calculateRouteDistance(route[userIndex:ghostIndex]);
+            return calculatePartialRouteDistance(route, userIndex, ghostIndex);
         }
-        return 0;
-    }*/
+    }
     // This one is just temporary for testing
     public double calculateDistanceFromGhost(LatLng ghostLocation, LatLng userLocation) {
         if (ghostLocation == null) { return -1; }
