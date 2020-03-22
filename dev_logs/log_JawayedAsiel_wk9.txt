@@ -2,3 +2,5 @@
 HH:MM:SS:mSmSmS format 
 
 1 hour: Fixed issues with a updateDeviceLocation being called every tick of the chronometer. Changed to activate after 60 ticks so  it correlates to 1 call per second
+
+2 hours: Preparing for oral presentation
