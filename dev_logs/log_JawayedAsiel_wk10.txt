@@ -1,4 +1,4 @@
 30 minutes : Reviewed code changes and added a delay to the distance counter so that it appears 1 second after
  (Removes issue of having textView pop up for a second before updating  distance)
 
-Merged to master branch
+Merged code in JawayedEdits2 to master branch
