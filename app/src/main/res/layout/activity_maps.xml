@@ -83,7 +83,7 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@+id/routesButton" />
 
-    <Chronometer
+    <com.example.ghostpb.ChronometerExtended
         android:id="@+id/timerChronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@+id/activeSwitch" />
 
-    <Chronometer
+    <com.example.ghostpb.ChronometerExtended
         android:id="@+id/ghostChronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
