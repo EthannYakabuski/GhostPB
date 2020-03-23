@@ -100,7 +100,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int selectedID = -1;
 
     //access to the chronometer
-    protected Chronometer timerFunctionality;
+    protected ChronometerExtended timerFunctionality;
     private boolean chronometerRunning;
 
     //variables used to help draw the route live
@@ -192,20 +192,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //set the chronometer variable used for stopwatch functionality
         timerFunctionality = findViewById(R.id.timerChronometer);
-        timerFunctionality.setFormat("Time: %s");
+        //timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
-        //the function that is called every second when the chronometer ticks
+        //the function that is called every second when the chronometer 60 times. This makes updateDeviceLocation get called once per second
         //in our case we cant to update the users location and save the route point to the proper route in the backing arraylist
         timerFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            long mTicks = 0;
             @Override
             public void onChronometerTick(Chronometer chronometer) {
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
-                //call the custom function to update users location and store route information
-                updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
-
+                if ((mTicks / 60) == 1 ) {
+                    //call the custom function to update users location and store route information
+                    updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
+                    mTicks = 0;
+                }
+                mTicks++;
+                //Log.d(ROUTE_TAG, "Current elapsed millis" + elapsedMillis);
+                //Log.d(ROUTE_TAG, "The current tick is : " + mTicks);
             }
         });
 
@@ -268,8 +274,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 timerFunctionality.stop();
 
                 // Get the time it took
-                endTime = (SystemClock.elapsedRealtime() - timerFunctionality.getBase()) / 1000;
-                Log.d(ROUTE_TAG, "Time: " + DateUtils.formatElapsedTime(endTime));
+                //endTime = (SystemClock.elapsedRealtime() - timerFunctionality.getBase()) / 1000;
+                //Log.d(ROUTE_TAG, "Time: " + DateUtils.formatElapsedTime(endTime));
+                endTime = timerFunctionality.getTimePassed();
 
                 //reset the variable keeping track of user location for live drawing of their route
                 lastPoint = new LatLng(0, 0);
@@ -534,8 +541,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 newRouteBtn.setClickable(false);
                 routesBtn.setClickable(false);
 
-                // set distanceCounter to visible while making new route
-                distanceCounter.setVisibility(View.VISIBLE);
+                // set distanceCounter to visible while making new route AFTER 1 second has passed
+                //distanceCounter.setVisibility(View.VISIBLE);
+                distanceCounter.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        distanceCounter.setVisibility(View.VISIBLE);
+                    }
+                }, 1000);
 
                 //calls custom function to start routing the route and tracking the users location and time
                 startRoute(v);

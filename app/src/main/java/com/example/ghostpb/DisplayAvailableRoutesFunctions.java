@@ -99,11 +99,23 @@ public abstract class DisplayAvailableRoutesFunctions {
         if (routesInformation != null) {
             //for each route that is stored save that name information in the routesNames array
             for (int i = 0; i < routesInformation.size(); i++) {
-                routeNames.add(routesInformation.get(i).getName() + "          " + DateUtils.formatElapsedTime(routesInformation.get(i).getTime()));
+                //routeNames.add(routesInformation.get(i).getName() + "          " + DateUtils.formatElapsedTime(routesInformation.get(i).getTime()));
+                routeNames.add(routesInformation.get(i).getName() + "          " + formatTime(routesInformation.get(i).getTime()));
             }
         }
 
         return routeNames;
     }
 
+    //Takes the time (in milliseconds) and converts it to
+    //HH:MM:SS:mSmSmS format
+    protected String formatTime(long time) {
+        int milliseconds  = (int)((time % 1000));
+        int seconds = (int)((time/1000) % 60);
+        int minutes = (int)((time/60000) % 60);
+        int hours   = (int)((time/3600000) % 24);
+
+        return (String.format("%02d:%02d:%02d:%03d", hours, minutes, seconds, milliseconds));
+    }
 }
+
