@@ -11,33 +11,8 @@ public abstract class DisplayAvailableRoutesFunctions {
     private ArrayList<Route> routesInformation;
     private int selectedRoute;
     private View selectedView;
+    private static final int MAX_NAME_LENGTH = 15;
 
-
-    /* Singleton */
-/*
-    private static final DisplayAvailableRoutesFunctions ourInstance = new DisplayAvailableRoutesFunctions();
-
-    public static DisplayAvailableRoutesFunctions getInstance() {
-        return ourInstance;
-    }
-
-    protected DisplayAvailableRoutesFunctions(){}
-
- */
-
-    /* Singleton */
-
-
-/*
-    DisplayAvailableRoutesFunctions(ArrayList<Route> routesInformation){
-        this.routesInformation = routesInformation;
-    }
-
-
-    protected void init(ArrayList<Route> routesInformation){
-        this.routesInformation = routesInformation;
-    }
-    */
     protected void setRoutesInformation(ArrayList<Route> routesInformation){
         this.routesInformation = routesInformation;
     }
@@ -95,12 +70,20 @@ public abstract class DisplayAvailableRoutesFunctions {
     protected ArrayList<String> updateNamesArray() {
 
         ArrayList<String> routeNames = new ArrayList<>();
+        String nameAndTime;
+        String name;
+        String time;
 
         if (routesInformation != null) {
             //for each route that is stored save that name information in the routesNames array
             for (int i = 0; i < routesInformation.size(); i++) {
                 //routeNames.add(routesInformation.get(i).getName() + "          " + DateUtils.formatElapsedTime(routesInformation.get(i).getTime()));
-                routeNames.add(routesInformation.get(i).getName() + "          " + formatTime(routesInformation.get(i).getTime()));
+                name = routesInformation.get(i).getName();
+                name = name.substring(0, Math.min(name.length(), MAX_NAME_LENGTH));
+                time = formatTime(routesInformation.get(i).getTime());
+                nameAndTime = name + String.format("%" + 1000 + "s", time);
+
+                routeNames.add(nameAndTime);
             }
         }
 

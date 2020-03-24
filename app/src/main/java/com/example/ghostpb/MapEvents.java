@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.SystemClock;
+import android.text.InputFilter;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -38,6 +39,8 @@ public class MapEvents {
     //array list of routes for holding the information pertaining to the users routes
     protected ArrayList<Route> routesInformation = new ArrayList<>();
 
+    private String newName;
+
     //buttons for the click event listeners
     private Button clearBtn;
     private Button stopBtn;
@@ -56,6 +59,7 @@ public class MapEvents {
     private static final String ROUTES_INFO = "routesInfo";
     private static final String CHAR_FILTER = "^[!@#$&()`.+,/\\\"]*$";
     private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
+    private static final int MAX_NAME_LENGTH = 15;
 
     // textview for distance tracker
     private TextView distanceCounter;
@@ -150,24 +154,29 @@ public class MapEvents {
                             LinearLayout.LayoutParams.MATCH_PARENT);
                     input.setLayoutParams(lp);
 
+                    // Sets the max name length
+                    // InputFilter[] editTextFilter = {new InputFilter.LengthFilter(MAX_NAME_LENGTH)};
+                    // input.setFilters(editTextFilter);
+
                     // Chain together various setter methods to set the dialog characteristics
-                    builder.setMessage("Enter the name for this route:")
+                    builder.setMessage("Enter the name for this route (Max Char: 15):")
                             .setTitle(R.string.dialog_name_title);
 
                     // Add the buttons
                     builder.setPositiveButton(R.string.enter, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             // User clicked Enter button - Rename the route from the EditText if not empty, etc.
-                            String newName = input.getText().toString().trim();
+                            newName = input.getText().toString().trim();
                             if (!newName.isEmpty() && !CHAR_PATTERN.matcher(newName).matches()) {
+
                                 // Set route name
+                                newName = newName.substring(0, Math.min(newName.length(), MAX_NAME_LENGTH));
                                 routesInformation.get(routeNumber).setName(newName);
 
                                 // Set the time
                                 routesInformation.get(routeNumber).setTime(endTime);
 
                                 ((MapsActivity) mapsActivity).setRoutesInformation(routesInformation);
-
 
                                 // A toast will pop up showing success
                                 Toast toast = Toast.makeText(mapsActivity, newName + " saved", Toast.LENGTH_SHORT);
