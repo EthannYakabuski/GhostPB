@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -34,12 +33,17 @@ public class DisplayAvailableRoutesEvents extends DisplayAvailableRoutesFunction
     private ArrayAdapter<String> adapter;
     private ArrayList<Button> visibilityButtons = new ArrayList<>();
     private ArrayList<String> routeNames;
+    private String newName;
+    private String newNameAndTime;
+    private String time;
+    private Route selectedRoute;
 
     private static final String ROUTE_TAG = "ROUTE";
     private static final String ROUTE_ID = "routeID";
     private static final String ROUTES_INFO = "routesInfo";
     private static final String CHAR_FILTER = "^[!@#$&()`.+,/\\\"]*$";
     private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
+    private static final int MAX_NAME_LENGTH = 15;
 
     /* Singleton */
     private static final DisplayAvailableRoutesEvents ourInstance = new DisplayAvailableRoutesEvents();
@@ -149,20 +153,27 @@ public class DisplayAvailableRoutesEvents extends DisplayAvailableRoutesFunction
                         LinearLayout.LayoutParams.MATCH_PARENT);
                 input.setLayoutParams(lp);
 
+                // Sets the max name length
+                //input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_NAME_LENGTH)});
+
+                selectedRoute = getRoutesInformation().get(getSelectedRoute());
+
                 // Chain together various setter methods to set the dialog characteristics
-                builder.setMessage("Enter the new name for " + getRoutesInformation().get(getSelectedRoute()).getName())
+                builder.setMessage("Enter the new name for " + selectedRoute.getName().substring(0, Math.min(selectedRoute.getName().length(), MAX_NAME_LENGTH)) + " (Max Char: 15)")
                         .setTitle(R.string.dialog_rename_title);
 
                 // Add the buttons
                 builder.setPositiveButton(R.string.enter, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User clicked Enter button - Rename the route from the EditText if not empty, etc.
-                        String newName = input.getText().toString().trim();
+                        newName = input.getText().toString().trim();
                         if (!newName.isEmpty() && !CHAR_PATTERN.matcher(newName).matches()) {
                             // Update names, routes info, and list items
+                            newName = newName.substring(0, Math.min(newName.length(), MAX_NAME_LENGTH));
                             setRouteName(newName);
-                            newName = input.getText().toString().trim() + "          " + DateUtils.formatElapsedTime(getRoutesInformation().get(getSelectedRoute()).getTime());
-                            routeNames.set(getSelectedRoute(), newName);
+                            time = formatTime(getRoutesInformation().get(getSelectedRoute()).getTime());
+                            newNameAndTime = newName + String.format("%" + 1000 + "s", time);
+                            routeNames.set(getSelectedRoute(), newNameAndTime);
                             adapter.notifyDataSetChanged();
                         }
                         else{
@@ -204,7 +215,8 @@ public class DisplayAvailableRoutesEvents extends DisplayAvailableRoutesFunction
                 AlertDialog.Builder builder = new AlertDialog.Builder(dar);
 
                 // Chain together various setter methods to set the dialog characteristics
-                builder.setMessage("Delete " + getRoutesInformation().get(getSelectedRoute()).getName() + "?")
+                selectedRoute = getRoutesInformation().get(getSelectedRoute());
+                builder.setMessage("Delete " + selectedRoute.getName().substring(0, Math.min(selectedRoute.getName().length(), MAX_NAME_LENGTH)) + "?")
                         .setTitle(R.string.dialog_delete_title);
 
                 // Add the buttons
