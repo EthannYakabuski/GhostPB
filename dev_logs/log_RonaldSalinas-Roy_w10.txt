@@ -1,0 +1,5 @@
+4 hours:
+  Changed time format in the displayAvailableRoutesActivity from MM:SS to HH:MM:SS:mSmSmS.
+  Put a character limit of 15 on the display of route names. Was unable to get InputFilter working on the EditTexts
+  Formatted the appearance of the cells within the displayAvailableRoutesActivity to have the time be located underneath the name
+  Encountered issues in trying to make displaying the name with the time prettier, as alignment was difficult from what I believe to be the width of characters. Tried various ways to figure out how I should get the spacing between the name and time. Some of these ways make use of: StringBuilder, String.Format, strings built through for loops 
