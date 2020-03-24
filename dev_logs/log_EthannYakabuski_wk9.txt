@@ -1,0 +1,6 @@
+March 16 - March 22nd
+
+2 hours: Refactoring maps activity into Drawing Facade
+1 hour: Created a slide for the D3 presentation, added notes for each slide
+4 hours: Preparation and resource arrangement on local drive for easy access during oral exam
+1 hour: Oral exam
