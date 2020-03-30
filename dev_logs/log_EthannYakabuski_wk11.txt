@@ -1,0 +1,7 @@
+March 30th - April 5th
+
+TODO:
+YT video for D3 - filming 2 hours & post production 2 hours
+Reduce code smells in current code base and implement JSON instead for file IO - 4 hours
+
+Study for Oral Exam D4 - a lot update later
