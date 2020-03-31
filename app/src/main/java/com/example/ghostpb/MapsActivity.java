@@ -181,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         activeSwitch = findViewById(R.id.activeSwitch);
 
         // set distanceCounter to invisible by default
-        distanceCounter = (TextView) findViewById(R.id.distanceCounter);
+        distanceCounter = findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
 
         // buttons associated with racing the ghost are invisible until the user has selected a route
@@ -226,9 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if(locationResult == null) {
-                    return;
-                }
+
             }
         };
 
@@ -914,10 +912,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String[] parsed = sb.toString().split(delimiter);
 
-            for(int i = 0; i < parsed.length; i++) {
+            //for(int i = 0; i < parsed.length; i++) {
 
                 //Log.d("FILE-TEST", parsed[i]);
-            }
+            //}
 
             //if there is data in the file that has been read
             if(parsed.length > 0) {
