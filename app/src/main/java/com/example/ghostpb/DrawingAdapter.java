@@ -12,12 +12,9 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 
-/* TO-DO
-Replace old method calls in MapsActivity with with drawingFacade.methodCall();
- */
 
-/*Facade design pattern supplying a simple interface to mapsActivity.java for all drawing related functionality*/
-public class DrawingFacade {
+/*Adapter design pattern supplying a wrapper around drawing functionality related to mapsActivity.java*/
+public class DrawingAdapter {
     //the backing map object
     private GoogleMap backingMap;
 
@@ -34,17 +31,17 @@ public class DrawingFacade {
 
 
     /* singleton */
-    private static final DrawingFacade ourInstance = new DrawingFacade();
+    private static final DrawingAdapter ourInstance = new DrawingAdapter();
 
-    public static DrawingFacade getInstance() {
+    public static DrawingAdapter getInstance() {
         return ourInstance;
     }
 
-    DrawingFacade() {
+    private DrawingAdapter() {
 
     }
 
-    DrawingFacade(GoogleMap m) {
+    DrawingAdapter(GoogleMap m) {
 
         backingMap = m;
     }
@@ -57,10 +54,8 @@ public class DrawingFacade {
     }
 
 
-    //FACADE INTERFACE FUNCTIONALITY
-
     //clears all of the ghosts on the map
-    public void clearGhosts() {
+    private void clearGhosts() {
 
         for(int i = 0; i < ghosts.size(); i++) {
 
@@ -72,7 +67,7 @@ public class DrawingFacade {
     }
 
     //clears all of the lines on the map
-    public void clearLines() {
+    private void clearLines() {
 
         for(int i = 0; i < lines.size(); i++) {
 
@@ -85,14 +80,14 @@ public class DrawingFacade {
     }
 
     //clears all of the ghosts and lines on the map
-    public void clearMap() {
+    void clearMap() {
         this.clearLines();
         this.clearGhosts();
 
     }
 
     //draws the given route to the map
-    public void drawRoute(Route route) {
+    void drawRoute(Route route) {
 
         Log.d(ROUTE_TAG, "Drawing route: " + route.getName());
 
@@ -109,7 +104,7 @@ public class DrawingFacade {
     }
 
     //this custom function draws a line between previous and current, simulating a cohesive line being drawn behind user as they are making a route
-    public void drawRouteLive(LatLng previous, LatLng current) {
+    void drawRouteLive(LatLng previous, LatLng current) {
 
         //if there is actual information in the last point
         if (!(previous.longitude == 0)) {
@@ -125,7 +120,7 @@ public class DrawingFacade {
 
 
     //this function updates the ghost location, it requires a route, and the time that the ghost is currently at one the route
-    public void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
+    void updateGhostLocation(Route currentRoute, long timeWhenHappenned) {
 
         //keep the map clean from previous runs
         if(ghostCounter == 0) {

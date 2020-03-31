@@ -63,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //the map
     private GoogleMap mMap;
 
-    public DrawingFacade drawingFacade;
+    public DrawingAdapter drawingAdapter;
 
     //fused location provider
     //use this to access current locaation information in the form of a LatLng object
@@ -147,6 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int DISPLAY_ROUTES_CODE = 0;
     private static final String ROUTE_ID = "routeID";
     private static final String ROUTES_INFO = "routesInfo";
+    private static final String CHRONOMETER_TAG = "TIME-TICK";
     private static final String CHAR_FILTER = "^[!@#$&()`.+,/\\\"]*$";
     private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
 
@@ -171,13 +172,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         readFile();
 
         // Widgets for the click event listeners
-        clearBtn     = (Button) findViewById(R.id.clearMapButton);
-        stopBtn      = (Button) findViewById(R.id.stopButton);
-        routesBtn    = (Button) findViewById(R.id.routesButton);
-        newRouteBtn  = (Button) findViewById(R.id.newRouteButton);
-        startRaceBtn = (Button) findViewById(R.id.startRaceButton);
-        stopRaceBtn  = (Button) findViewById(R.id.stopRaceButton);
-        activeSwitch = (Switch) findViewById(R.id.activeSwitch);
+        clearBtn     = findViewById(R.id.clearMapButton);
+        stopBtn      = findViewById(R.id.stopButton);
+        routesBtn    = findViewById(R.id.routesButton);
+        newRouteBtn  = findViewById(R.id.newRouteButton);
+        startRaceBtn = findViewById(R.id.startRaceButton);
+        stopRaceBtn  = findViewById(R.id.stopRaceButton);
+        activeSwitch = findViewById(R.id.activeSwitch);
 
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
@@ -205,6 +206,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
                 if ((mTicks / 60) == 1 ) {
+                    Log.d(CHRONOMETER_TAG,"ticking");
                     //call the custom function to update users location and store route information
                     updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
                     mTicks = 0;
@@ -393,7 +395,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d(ROUTE_TAG, "Clear button clicked");
 
                 //clearMap();
-                drawingFacade.clearMap();
+                drawingAdapter.clearMap();
             }
         });
  
@@ -589,7 +591,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //drawRoute(selectedRoute);
 
             //draw the selected route to the screen new refactor
-            drawingFacade.drawRoute(selectedRoute);
+            drawingAdapter.drawRoute(selectedRoute);
 
             //move camera to start of the route
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedRoute.getPoint(0).getLocation(),DEFAULT_ZOOM));
@@ -613,7 +615,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        drawingFacade = new DrawingFacade(mMap);
+        drawingAdapter = new DrawingAdapter(mMap);
 
         //calls the custom function to ask the user for location permissions
         requestLocationPermissions();
@@ -771,7 +773,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                 //draw the route live new refactor
-                                drawingFacade.drawRouteLive(lastPoint, locationNow);
+                                drawingAdapter.drawRouteLive(lastPoint, locationNow);
 
                                 lastPoint = locationNow;
 
@@ -783,7 +785,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //updateGhostLocation(activeGhostRoute, ghostPointLocation);
 
                                     //new refactor updateGhostLocation
-                                    drawingFacade.updateGhostLocation(selectedRoute, ghostPointLocation);
+                                    drawingAdapter.updateGhostLocation(selectedRoute, ghostPointLocation);
 
                                 }
 

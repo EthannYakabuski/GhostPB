@@ -28,7 +28,7 @@ public class MapEvents {
     private LatLng lastPoint = new LatLng(0, 0);
 
     //holds the number associated with the route you are currently making
-    protected int routeNumber = -1;
+    private int routeNumber = -1;
 
     //true when user is currently making a new route
     private boolean currentlyMakingARoute;
@@ -37,7 +37,7 @@ public class MapEvents {
     private long endTime = 0;
 
     //array list of routes for holding the information pertaining to the users routes
-    protected ArrayList<Route> routesInformation = new ArrayList<>();
+    private ArrayList<Route> routesInformation = new ArrayList<>();
 
     private String newName;
 
@@ -69,9 +69,9 @@ public class MapEvents {
     private int ghostCounter = -1;
 
     /* Singleton */
-    private static final MapEvents ourInstance = new MapEvents();
+    private final MapEvents ourInstance = new MapEvents();
 
-    public static MapEvents getInstance() {
+    public MapEvents getInstance() {
         return ourInstance;
     }
 
@@ -81,16 +81,16 @@ public class MapEvents {
     protected void init(final Context mapsActivity){
 
         // Widgets for the click event listeners
-        clearBtn     = (Button) ((MapsActivity) mapsActivity).findViewById(R.id.clearMapButton);
-        stopBtn      = (Button) ((MapsActivity) mapsActivity).findViewById(R.id.stopButton);
-        routesBtn    = (Button) ((MapsActivity) mapsActivity).findViewById(R.id.routesButton);
-        newRouteBtn  = (Button) ((MapsActivity) mapsActivity).findViewById(R.id.newRouteButton);
-        startRaceBtn = (Button) ((MapsActivity) mapsActivity).findViewById(R.id.startRaceButton);
-        stopRaceBtn  = (Button) ((MapsActivity) mapsActivity).findViewById(R.id.stopRaceButton);
-        activeSwitch = (Switch) ((MapsActivity) mapsActivity).findViewById(R.id.activeSwitch);
+        clearBtn     = ((MapsActivity) mapsActivity).findViewById(R.id.clearMapButton);
+        stopBtn      = ((MapsActivity) mapsActivity).findViewById(R.id.stopButton);
+        routesBtn    = ((MapsActivity) mapsActivity).findViewById(R.id.routesButton);
+        newRouteBtn  = ((MapsActivity) mapsActivity).findViewById(R.id.newRouteButton);
+        startRaceBtn = ((MapsActivity) mapsActivity).findViewById(R.id.startRaceButton);
+        stopRaceBtn  = ((MapsActivity) mapsActivity).findViewById(R.id.stopRaceButton);
+        activeSwitch = ((MapsActivity) mapsActivity).findViewById(R.id.activeSwitch);
 
         // set distanceCounter to invisible by default
-        distanceCounter = (TextView) ((MapsActivity) mapsActivity).findViewById(R.id.distanceCounter);
+        distanceCounter = ((MapsActivity) mapsActivity).findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
 
         // buttons associated with racing the ghost are invisible until the user has selected a route
@@ -250,7 +250,7 @@ public class MapEvents {
             public void onClick(View v) {
                 Log.d(ROUTE_TAG, "Clear button clicked");
 
-                ((MapsActivity) mapsActivity).drawingFacade.clearMap();
+                ((MapsActivity) mapsActivity).drawingAdapter.clearMap();
             }
         });
 
