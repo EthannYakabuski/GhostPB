@@ -1,0 +1,2 @@
+1 Hour:
+  Determining a timer performance issue. Cause concluded to be by perfomance of device 
