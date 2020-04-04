@@ -196,8 +196,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
-        //the function that is called every second when the chronometer 60 times. This makes updateDeviceLocation get called once per second
-        //in our case we cant to update the users location and save the route point to the proper route in the backing arraylist
+
         timerFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             long mTicks = 0;
             @Override
@@ -205,7 +204,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
-                if ((mTicks / 60) == 1 ) {
+                if ((mTicks / 10) == 1 ) {
                     Log.d(CHRONOMETER_TAG,"ticking");
                     //call the custom function to update users location and store route information
                     updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
@@ -1144,6 +1143,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void setRouteNumber(int routeNumber){
         this.routeNumber = routeNumber;
     }
+
+
+
 
 }
 
