@@ -63,6 +63,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //the map
     private GoogleMap mMap;
 
+    // Navigate object
+    Navigate nav = Navigate.getInstance();
+
     public DrawingFacade drawingFacade;
 
     //fused location provider
@@ -150,8 +153,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String CHAR_FILTER = "^[!@#$&()`.+,/\\\"]*$";
     private static final Pattern CHAR_PATTERN = Pattern.compile(CHAR_FILTER);
 
-    // textview for distance tracker
+    // textview for distance trackers and navigation
     private TextView distanceCounter;
+    private TextView distanceFromGhost;
+    private TextView distanceFromClosestPoint;
+    private TextView onTrackText;
 
     public boolean racingAGhost;
     public int ghostPointLocation;
@@ -182,6 +188,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
+        distanceFromClosestPoint = (TextView) findViewById(R.id.distanceFromClosestPoint);
+        distanceFromClosestPoint.setVisibility(View.INVISIBLE);
+        distanceFromClosestPoint.setText("Distance from closest point: ");
+        distanceFromGhost = (TextView) findViewById(R.id.distanceFromGhost);
+        distanceFromGhost.setVisibility(View.INVISIBLE);
+        distanceFromGhost.setText("Distance from Ghost: ");
+        onTrackText = (TextView) findViewById(R.id.isOnTrack);
+        onTrackText.setVisibility(View.INVISIBLE);
+        onTrackText.setText(" USER ON TRACK: ");
+
+
 
         // buttons associated with racing the ghost are invisible until the user has selected a route
         startRaceBtn.setVisibility(View.INVISIBLE);
@@ -777,6 +794,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //if the user is currently racing a ghost, update the ghost location on the map
                                 if(racingAGhost) {
+                                    distanceFromClosestPoint.setVisibility(View.VISIBLE);
+                                    distanceFromGhost.setVisibility(View.VISIBLE);
+                                    onTrackText.setVisibility(View.VISIBLE);
                                     ghostPointLocation++;
                                     Log.d("GHOST TEST", "Racing against a ghost");
 
@@ -785,6 +805,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //new refactor updateGhostLocation
                                     drawingFacade.updateGhostLocation(selectedRoute, ghostPointLocation);
 
+                                    // NAVIGATION STUFF HAPPENS HERE FOR THE RACE
+                                    // This includes checking on track, checking distance from ghost
+                                    if(locationNow != null) {
+
+                                        // Find the closest point of the ghost's route to the user
+                                        RoutePoint temp = nav.findClosestRoutePoint(selectedRoute, locationNow);
+                                        if(temp != null) {
+                                            double distanceFromGhostCount = 0;
+
+                                            // Find the distance to the closest point of route and display it
+                                            //double distanceFromTrack = nav.calculateDistance(temp.getLocation(), locationNow);
+                                            double distanceFromTrack = nav.distanceFromRoute(selectedRoute, locationNow);
+                                            String distanceFromTrackText = String.format(Locale.CANADA, "Distance From Closest Point: %.2f Meters", distanceFromTrack);
+                                            distanceFromClosestPoint.setText(distanceFromTrackText);
+
+                                            // If user is within 100 meters of route, they are on track, otherwise off track, display it
+                                            if(nav.checkIfUserOnTrack(selectedRoute, locationNow)) {
+                                                String onTrackString = String.format(Locale.CANADA, "ON TRACK", distanceFromTrack);
+                                                onTrackText.setText(onTrackString);
+                                            }
+                                            else {
+                                                String onTrackString = String.format(Locale.CANADA, "OFF TRACK");
+                                                onTrackText.setText(onTrackString);
+                                            }
+
+                                            // Calculate distance from ghost
+                                            // If the ghost has not yet finished, use the ghosts current point in its route
+                                            if(ghostPointLocation < selectedRoute.getSize()) {
+                                                int ghostIndex = nav.findIndexOfRoute(selectedRoute, selectedRoute.getPoint(ghostPointLocation).getLocation());
+                                                int userIndex = nav.findIndexOfRoute(selectedRoute, temp.getLocation());
+                                                String logText = String.format(" : %d", ghostIndex);
+                                                Log.d("GHOST-INDEX", logText);
+                                                String logText2 = String.format(" : %d", userIndex);
+                                                Log.d("USER-INDEX", logText2);
+                                                //distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute.getPoint(ghostPointLocation).getLocation(), locationNow);
+                                                distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute,
+                                                        selectedRoute.getPoint(ghostPointLocation).getLocation(), locationNow);
+                                                if(ghostIndex == userIndex ) {
+                                                    String distanceFromGhostText = String.format(Locale.CANADA, "GHOST IS CLOSE\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                    distanceFromGhost.setText(distanceFromGhostText);
+                                                }
+                                                else if(userIndex > ghostIndex) {
+                                                    String distanceFromGhostText = String.format(Locale.CANADA, "YOU ARE AHEAD\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                    distanceFromGhost.setText(distanceFromGhostText);
+                                                }
+                                                else {
+                                                    String distanceFromGhostText = String.format(Locale.CANADA, "GHOST IS AHEAD\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                    distanceFromGhost.setText(distanceFromGhostText);
+                                                }
+                                            }
+                                            // The ghost has finished, used the last point of the ghost's route, in this case ghost is always ahead
+                                            else {
+                                                int finalPointLocation = selectedRoute.getSize()-1;
+                                                //distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute.getPoint(finalPointLocation).getLocation(), locationNow);
+                                                distanceFromGhostCount = nav.calculateDistanceFromGhost(selectedRoute,
+                                                        selectedRoute.getPoint(finalPointLocation).getLocation(), locationNow);
+                                                String distanceFromGhostText = String.format(Locale.CANADA, "GHOST IS AHEAD\nDistance From Ghost: %.2f Meters", distanceFromGhostCount);
+                                                distanceFromGhost.setText(distanceFromGhostText);
+                                            }
+                                        }
+                                        else {
+                                            onTrackText.setText("temp is null");
+                                        }
+                                    }
                                 }
 
                                 if(makingARoute) {

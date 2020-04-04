@@ -134,25 +134,53 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="148dp"
         android:text="@string/start_race_button"
         map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toBottomOf="@+id/distanceCounter"
-        />
+        map:layout_constraintTop_toBottomOf="@+id/distanceCounter" />
 
     <Button
         android:id="@+id/stopRaceButton"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="148dp"
         android:text="@string/stop_race_button"
         map:layout_constraintStart_toEndOf="@+id/startRaceButton"
         map:layout_constraintTop_toBottomOf="@+id/distanceCounter" />
 
+    <TextView
+        android:id="@+id/distanceFromGhost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        map:layout_constraintBottom_toTopOf="@+id/stopRaceButton"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/distanceCounter"
+        map:layout_constraintVertical_bias="0.053" />
 
+    <TextView
+        android:id="@+id/distanceFromClosestPoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        map:layout_constraintBottom_toTopOf="@+id/stopRaceButton"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/distanceFromGhost"
+        map:layout_constraintVertical_bias="0.067" />
+
+    <TextView
+        android:id="@+id/isOnTrack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        map:layout_constraintBottom_toTopOf="@+id/stopRaceButton"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/distanceFromClosestPoint"
+        map:layout_constraintVertical_bias="0.102" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
