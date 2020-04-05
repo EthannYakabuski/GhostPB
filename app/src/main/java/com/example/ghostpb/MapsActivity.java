@@ -156,7 +156,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // textview for distance trackers and navigation
     private TextView distanceCounter;
     private TextView distanceFromGhost;
-    private TextView distanceFromClosestPoint;
+    //private TextView distanceFromClosestPoint;
+
     private TextView onTrackText;
 
     public boolean racingAGhost;
@@ -188,9 +189,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // set distanceCounter to invisible by default
         distanceCounter = (TextView) findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
-        distanceFromClosestPoint = (TextView) findViewById(R.id.distanceFromClosestPoint);
-        distanceFromClosestPoint.setVisibility(View.INVISIBLE);
-        distanceFromClosestPoint.setText("Distance from closest point: ");
+        //distanceFromClosestPoint = (TextView) findViewById(R.id.distanceFromClosestPoint);
+        //distanceFromClosestPoint.setVisibility(View.INVISIBLE);
+        //distanceFromClosestPoint.setText("Distance from closest point: ");
         distanceFromGhost = (TextView) findViewById(R.id.distanceFromGhost);
         distanceFromGhost.setVisibility(View.INVISIBLE);
         distanceFromGhost.setText("Distance from Ghost: ");
@@ -264,6 +265,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         display.getSize(size);
         int width = size.x;
         int height = size.y;
+
+        //added
+        int percentageOffHeight = (int) (height/50);
+        height = height - percentageOffHeight;
+
+        //added
+
         Log.e(ROUTE_TAG, "Device width of " + width);
         Log.e(ROUTE_TAG, "Device height of " + height);
         ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
@@ -614,6 +622,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             showGhostRaceButton();
 
 
+
+
         }
     }
 
@@ -794,7 +804,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //if the user is currently racing a ghost, update the ghost location on the map
                                 if(racingAGhost) {
-                                    distanceFromClosestPoint.setVisibility(View.VISIBLE);
+                                    //distanceFromClosestPoint.setVisibility(View.VISIBLE);
                                     distanceFromGhost.setVisibility(View.VISIBLE);
                                     onTrackText.setVisibility(View.VISIBLE);
                                     ghostPointLocation++;
@@ -818,7 +828,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             //double distanceFromTrack = nav.calculateDistance(temp.getLocation(), locationNow);
                                             double distanceFromTrack = nav.distanceFromRoute(selectedRoute, locationNow);
                                             String distanceFromTrackText = String.format(Locale.CANADA, "Distance From Closest Point: %.2f Meters", distanceFromTrack);
-                                            distanceFromClosestPoint.setText(distanceFromTrackText);
+                                            //distanceFromClosestPoint.setText(distanceFromTrackText);
 
                                             // If user is within 100 meters of route, they are on track, otherwise off track, display it
                                             if(nav.checkIfUserOnTrack(selectedRoute, locationNow)) {
