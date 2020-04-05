@@ -363,6 +363,8 @@ public class MapEvents {
                 ((MapsActivity) mapsActivity).timerFunctionality.stop();
                 ((MapsActivity) mapsActivity).timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
+                ((MapsActivity) mapsActivity).drawingAdapter.resetGhostPoint();
+
                 ghostCounter = -1;
 
 

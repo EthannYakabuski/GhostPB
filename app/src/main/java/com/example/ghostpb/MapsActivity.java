@@ -524,6 +524,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 ghostCounter = -1;
 
+                drawingAdapter.resetGhostPoint();
+
 
             }
 

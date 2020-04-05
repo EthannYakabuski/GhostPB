@@ -51,6 +51,10 @@ public class DrawingAdapter {
     /* singleton */
 
 
+    void resetGhostPoint() {
+        ghostCounter = -1;
+
+    }
 
     public void addMap(GoogleMap m) {
         backingMap = m;
