@@ -1,7 +1,22 @@
 March 30th - April 5th
 
-TODO:
-YT video for D3 - filming 2 hours & post production 2 hours
-Reduce code smells in current code base and implement JSON instead for file IO - 4 hours
+Youtube video for D3
+- filming 2 hours
+- post production in adobe premiere 2 hours
 
-Study for Oral Exam D4 - a lot update later
+Reduce code smells in current code base
+- 1 hour
+
+Debugging of chronometer; hardware presenting different outcomes
+- 1 hour
+
+Navigate branch modify and merge
+- 1 hour
+
+Layout changes & field testing, field debugging of chronometer
+- 1 hour
+
+Redo some filming and editing
+- 30 minutes
+
+Study for Oral Exam D4
