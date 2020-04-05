@@ -1,1 +1,4 @@
 
+1 hour spent trying to figure out why chronometer tick rates varied between devices. Determined it to be due to weaker hardware
+
+4 hours spent trying researching and writing code that can have it tick at the appropriate rate per second. Did not find a solution.
