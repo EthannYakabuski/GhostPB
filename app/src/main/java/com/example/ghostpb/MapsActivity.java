@@ -222,7 +222,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
-                if ((mTicks / 60) == 1 ) {
+                if ((mTicks / 10) == 1 ) {
                     //call the custom function to update users location and store route information
                     updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
                     mTicks = 0;
