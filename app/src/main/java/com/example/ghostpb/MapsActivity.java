@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Navigate object
     Navigate nav = Navigate.getInstance();
 
-    public DrawingFacade drawingFacade;
+    public DrawingAdapter drawingAdapter;
 
     //fused location provider
     //use this to access current locaation information in the form of a LatLng object
@@ -178,24 +178,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         readFile();
 
         // Widgets for the click event listeners
-        clearBtn     = (Button) findViewById(R.id.clearMapButton);
-        stopBtn      = (Button) findViewById(R.id.stopButton);
-        routesBtn    = (Button) findViewById(R.id.routesButton);
-        newRouteBtn  = (Button) findViewById(R.id.newRouteButton);
-        startRaceBtn = (Button) findViewById(R.id.startRaceButton);
-        stopRaceBtn  = (Button) findViewById(R.id.stopRaceButton);
-        activeSwitch = (Switch) findViewById(R.id.activeSwitch);
+        clearBtn     = findViewById(R.id.clearMapButton);
+        stopBtn      = findViewById(R.id.stopButton);
+        routesBtn    = findViewById(R.id.routesButton);
+        newRouteBtn  = findViewById(R.id.newRouteButton);
+        startRaceBtn = findViewById(R.id.startRaceButton);
+        stopRaceBtn  = findViewById(R.id.stopRaceButton);
+        activeSwitch = findViewById(R.id.activeSwitch);
 
         // set distanceCounter to invisible by default
-        distanceCounter = (TextView) findViewById(R.id.distanceCounter);
+        distanceCounter = findViewById(R.id.distanceCounter);
         distanceCounter.setVisibility(View.INVISIBLE);
         //distanceFromClosestPoint = (TextView) findViewById(R.id.distanceFromClosestPoint);
         //distanceFromClosestPoint.setVisibility(View.INVISIBLE);
         //distanceFromClosestPoint.setText("Distance from closest point: ");
-        distanceFromGhost = (TextView) findViewById(R.id.distanceFromGhost);
+        distanceFromGhost = findViewById(R.id.distanceFromGhost);
         distanceFromGhost.setVisibility(View.INVISIBLE);
         distanceFromGhost.setText("Distance from Ghost: ");
-        onTrackText = (TextView) findViewById(R.id.isOnTrack);
+        onTrackText = findViewById(R.id.isOnTrack);
         onTrackText.setVisibility(View.INVISIBLE);
         onTrackText.setText(" USER ON TRACK: ");
 
@@ -222,7 +222,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
-                if ((mTicks / 10) == 1 ) {
+                if ((mTicks / 30) == 1 ) {
                     //call the custom function to update users location and store route information
                     updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
                     mTicks = 0;
@@ -242,9 +242,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if(locationResult == null) {
-                    return;
-                }
+
             }
         };
 
@@ -265,13 +263,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-
-        //added
-        int percentageOffHeight = (int) (height/50);
-        height = height - percentageOffHeight;
-
-        //added
-
         Log.e(ROUTE_TAG, "Device width of " + width);
         Log.e(ROUTE_TAG, "Device height of " + height);
         ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
@@ -418,7 +409,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d(ROUTE_TAG, "Clear button clicked");
 
                 //clearMap();
-                drawingFacade.clearMap();
+                drawingAdapter.clearMap();
             }
         });
  
@@ -614,7 +605,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //drawRoute(selectedRoute);
 
             //draw the selected route to the screen new refactor
-            drawingFacade.drawRoute(selectedRoute);
+            drawingAdapter.drawRoute(selectedRoute);
 
             //move camera to start of the route
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedRoute.getPoint(0).getLocation(),DEFAULT_ZOOM));
@@ -640,7 +631,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        drawingFacade = new DrawingFacade(mMap);
+        drawingAdapter = new DrawingAdapter(mMap);
 
         //calls the custom function to ask the user for location permissions
         requestLocationPermissions();
@@ -798,7 +789,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                 //draw the route live new refactor
-                                drawingFacade.drawRouteLive(lastPoint, locationNow);
+                                drawingAdapter.drawRouteLive(lastPoint, locationNow);
 
                                 lastPoint = locationNow;
 
@@ -813,7 +804,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //updateGhostLocation(activeGhostRoute, ghostPointLocation);
 
                                     //new refactor updateGhostLocation
-                                    drawingFacade.updateGhostLocation(selectedRoute, ghostPointLocation);
+                                    drawingAdapter.updateGhostLocation(selectedRoute, ghostPointLocation);
 
                                     // NAVIGATION STUFF HAPPENS HERE FOR THE RACE
                                     // This includes checking on track, checking distance from ghost
@@ -1006,10 +997,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String[] parsed = sb.toString().split(delimiter);
 
-            for(int i = 0; i < parsed.length; i++) {
 
-                //Log.d("FILE-TEST", parsed[i]);
-            }
 
             //if there is data in the file that has been read
             if(parsed.length > 0) {

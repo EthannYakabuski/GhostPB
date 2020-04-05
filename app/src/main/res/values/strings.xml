@@ -25,4 +25,5 @@
     <string name="confirm">Confirm</string>
     <string name="start_race_button">Start Race</string>
     <string name="stop_race_button">Stop Race</string>
+    <string name="ghost_distance_tag">Ghost is ahead</string>
 </resources>
