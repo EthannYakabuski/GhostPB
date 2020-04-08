@@ -20,6 +20,9 @@ public class RoutePointDataClass {
         timeAtLocation = time;
     }
 
+    public RoutePointDataClass() {
+    }
+
     public LatLng getLocation() {
         return location;
     }
@@ -27,5 +30,15 @@ public class RoutePointDataClass {
     public long getTimeAtLocation() {
         return timeAtLocation;
     }
+
+    public void setLocation(LatLng loc) {
+        location = loc;
+    }
+
+    public void setTimeAtLocation(long time) {
+        timeAtLocation = time;
+    }
+
+
 
 }

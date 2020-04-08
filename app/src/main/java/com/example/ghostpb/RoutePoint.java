@@ -15,21 +15,21 @@ import java.sql.Time;
 public class RoutePoint implements Parcelable {
 
     //holds the latitude and longitude of the user when this route point was created
-    private LatLng location;
+    //private LatLng location;
     //holds a time object that was created when the user was at the above location
-    private long timeAtLocation;
+   // private long timeAtLocation;
 
     //holds the data class for this routepoint
     private RoutePointDataClass pointData;
 
     //returns the LatLng object private variable location
     LatLng getLocation() {
-        return location;
+        return pointData.getLocation();
     }
 
     //returns the Time object associated with the above LatLng object
     public long getTime() {
-        return timeAtLocation;
+        return  pointData.getTimeAtLocation();
     }
 
 
@@ -39,9 +39,9 @@ public class RoutePoint implements Parcelable {
 
         String returnString = "";
 
-        returnString = returnString + Double.toString(location.latitude);
+        returnString = returnString + Double.toString(pointData.getLocation().latitude);
         returnString = returnString + "//";
-        returnString = returnString + Double.toString(location.longitude);
+        returnString = returnString + Double.toString(pointData.getLocation().longitude);
 
         //Log.d("FILE-TEST", "to string route point: " + returnString);
 
@@ -52,19 +52,20 @@ public class RoutePoint implements Parcelable {
     //constructor
     RoutePoint(LatLng latLngObj, long time) {
 
-        location = latLngObj;
-        timeAtLocation = time;
+        //location = latLngObj;
+        //timeAtLocation = time;
 
         //new code
         //set the data class
-        //pointData = new RoutePointDataClass(latLngObj, time);
+        pointData = new RoutePointDataClass(latLngObj, time);
         //new code end
     }
 
     // Parcels are for being able to pass the Object through the intents
     RoutePoint(Parcel in){
-        location = (LatLng) in.readValue(LatLng.class.getClassLoader());
-        timeAtLocation = in.readLong();
+        pointData = new RoutePointDataClass();
+        pointData.setLocation((LatLng) in.readValue(LatLng.class.getClassLoader()));
+        pointData.setTimeAtLocation(in.readLong());
     }
 
     @Override
@@ -72,8 +73,8 @@ public class RoutePoint implements Parcelable {
         return this.hashCode();
     }
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(location);
-        dest.writeLong(timeAtLocation);
+        dest.writeValue(pointData.getLocation());
+        dest.writeLong(pointData.getTimeAtLocation());
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
