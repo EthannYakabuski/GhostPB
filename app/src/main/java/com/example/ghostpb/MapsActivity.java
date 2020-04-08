@@ -175,6 +175,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        drawingAdapter = new DrawingAdapter();
+
         //retrieve content view that renders the map
         setContentView(R.layout.activity_maps);
 
@@ -633,7 +635,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        drawingAdapter = new DrawingAdapter(mMap);
+
+        drawingAdapter.addMap(mMap);
 
         //calls the custom function to ask the user for location permissions
         requestLocationPermissions();

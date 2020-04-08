@@ -40,7 +40,7 @@ public class DrawingAdapter {
         return ourInstance;
     }
 
-    private DrawingAdapter() {
+    protected DrawingAdapter() {
 
     }
 
@@ -48,6 +48,7 @@ public class DrawingAdapter {
 
         backingMap = m;
     }
+
     /* singleton */
 
 
