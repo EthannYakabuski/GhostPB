@@ -5,9 +5,6 @@ import com.google.android.gms.maps.model.LatLng;
 /* Private class data design pattern
  */
 
-/* TO-DO:
-integrate into RoutePoint.java
- */
 public class RoutePointDataClass {
 
     //holds the latitude and longitude of the user when this route point was created
