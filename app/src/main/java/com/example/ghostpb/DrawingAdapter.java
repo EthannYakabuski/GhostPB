@@ -12,11 +12,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 
-/* TO-DO
-Replace old method calls in MapsActivity with with drawingFacade.methodCall();
- */
 
-/*Facade design pattern supplying a simple interface to mapsActivity.java for all drawing related functionality*/
 public class DrawingAdapter {
     //the backing map object
     private GoogleMap backingMap;
@@ -40,7 +36,7 @@ public class DrawingAdapter {
         return ourInstance;
     }
 
-    private DrawingAdapter() {
+    protected DrawingAdapter() {
 
     }
 
@@ -48,6 +44,7 @@ public class DrawingAdapter {
 
         backingMap = m;
     }
+
     /* singleton */
 
 
@@ -61,7 +58,6 @@ public class DrawingAdapter {
     }
 
 
-    //FACADE INTERFACE FUNCTIONALITY
 
     //clears all of the ghosts on the map
     private void clearGhosts() {

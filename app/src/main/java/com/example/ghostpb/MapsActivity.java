@@ -103,7 +103,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int selectedID = -1;
 
     //access to the chronometer
-    protected ChronometerExtended timerFunctionality;
+    //protected ChronometerExtended timerFunctionality;
+
+
+    protected Chronometer timerFunctionality;
+
     private boolean chronometerRunning;
 
     //variables used to help draw the route live
@@ -171,6 +175,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        drawingAdapter = new DrawingAdapter();
+
         //retrieve content view that renders the map
         setContentView(R.layout.activity_maps);
 
@@ -210,27 +216,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //set the chronometer variable used for stopwatch functionality
         timerFunctionality = findViewById(R.id.timerChronometer);
-        //timerFunctionality.setFormat("Time: %s");
+        timerFunctionality.setFormat("Time: %s");
         timerFunctionality.setBase(SystemClock.elapsedRealtime());
 
-        //the function that is called every second when the chronometer 60 times. This makes updateDeviceLocation get called once per second
-        //in our case we cant to update the users location and save the route point to the proper route in the backing arraylist
+
         timerFunctionality.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            long mTicks = 0;
+
             @Override
             public void onChronometerTick(Chronometer chronometer) {
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - timerFunctionality.getBase();
 
-                if ((mTicks / 30) == 1 ) {
                     //call the custom function to update users location and store route information
                     updateDeviceLocation(currentlyMakingARoute, elapsedMillis, routeNumber);
-                    mTicks = 0;
+
                 }
-                mTicks++;
                 //Log.d(ROUTE_TAG, "Current elapsed millis" + elapsedMillis);
                 //Log.d(ROUTE_TAG, "The current tick is : " + mTicks);
-            }
         });
 
 
@@ -290,9 +292,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 timerFunctionality.stop();
 
                 // Get the time it took
-                //endTime = (SystemClock.elapsedRealtime() - timerFunctionality.getBase()) / 1000;
-                //Log.d(ROUTE_TAG, "Time: " + DateUtils.formatElapsedTime(endTime));
-                endTime = timerFunctionality.getTimePassed();
+                endTime = (SystemClock.elapsedRealtime() - timerFunctionality.getBase()) / 1000;
+                Log.d(ROUTE_TAG, "Time: " + DateUtils.formatElapsedTime(endTime));
+                //endTime = timerFunctionality.getTimePassed();
 
                 //reset the variable keeping track of user location for live drawing of their route
                 lastPoint = new LatLng(0, 0);
@@ -633,7 +635,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        drawingAdapter = new DrawingAdapter(mMap);
+
+        drawingAdapter.addMap(mMap);
 
         //calls the custom function to ask the user for location permissions
         requestLocationPermissions();
@@ -876,6 +879,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 if(makingARoute) {
 
+                                    Log.d("NEW-TAG", "adding a point to the route");
                                     //make a new route point and add it to the temporary structure
                                     routesInformation.get(routeNumber).addPoint(new RoutePoint(locationNow, timeWhenHappenned));
                                     // calculate the total distance of the route to this point
