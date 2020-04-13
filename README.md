@@ -6,8 +6,8 @@ effectively being in a mental race against yourself.
 GhostPB allows users to track and time their runs using google maps API, and save them to the app so that they can "race" against
 themselves at a later date. The app will prompt the user if they are beating or losing to previous trials of the same track. 
 
-BEFORE YOU START, BUT AFTER YOU CLONE
-FIRST: Obtain your own google maps API KEY
+(MUST READ) BEFORE YOU START, BUT AFTER YOU CLONE THE REPOSITORY YOU MUST;
+FIRST: Obtain your own google maps API KEY; AND
 SECOND: in app/src/debug/res/values/google_maps_api.xml replace KEY_HERE with your new google maps API KEY
 
 This app is being developed in android studio. Instructions for set up and installation are here: 
